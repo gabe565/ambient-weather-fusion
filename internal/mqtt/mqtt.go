@@ -65,6 +65,7 @@ func Connect(ctx context.Context, conf *config.Config) (*autopaho.ConnectionMana
 	}
 
 	if err = client.AwaitConnection(ctx); err != nil {
+		_ = client.Disconnect(ctx)
 		return nil, err
 	}
 
