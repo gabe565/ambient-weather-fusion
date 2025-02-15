@@ -48,6 +48,8 @@ func run(cmd *cobra.Command, _ []string) error {
 
 	cmd.SilenceUsage = true
 
+	slog.Info("Ambient Weather Fusion", "version", cobrax.GetVersion(cmd), "commit", cobrax.GetCommit(cmd))
+
 	ctx, cancel := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	defer cancel()
 
