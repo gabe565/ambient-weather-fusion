@@ -173,3 +173,17 @@ func generatePayloads(entries []Data) map[string]any {
 		"dew_point":         computeMedian(entries, func(data Data) float64 { return data.LastData.DewPoint }),
 	}
 }
+
+func Cleanup(ctx context.Context, conf *config.Config, client *autopaho.ConnectionManager) error {
+	var group errgroup.Group
+	group.SetLimit(4)
+	for topic := range generatePayloads(nil) {
+		group.Go(func() error {
+			_, err := client.Publish(ctx, &paho.Publish{
+				Topic: mqtt.DataTopic(conf, topic),
+			})
+			return err
+		})
+	}
+	return group.Wait()
+}

@@ -59,6 +59,10 @@ func run(cmd *cobra.Command, _ []string) error {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
+		if err := ambientweather.Cleanup(ctx, conf, client); err != nil {
+			slog.Error("Failed to clean up ambient-weather payloads", "error", err)
+		}
+
 		if err := mqtt.Disconnect(ctx, conf, client); err != nil {
 			slog.Error("Failed to disconnect from mqtt", "error", err)
 		}
