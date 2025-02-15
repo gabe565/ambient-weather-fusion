@@ -11,36 +11,29 @@ import (
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
 )
 
 func PublishDiscovery(ctx context.Context, cmd *cobra.Command, conf *config.Config, client *autopaho.ConnectionManager) error {
-	var group errgroup.Group
-	group.SetLimit(4)
+	payload := generateDiscoveryPayload(cmd, conf)
 
-	for topic, data := range generateDiscoveryPayloads(cmd, conf) {
-		group.Go(func() error {
-			b, err := json.Marshal(data)
-			if err != nil {
-				return err
-			}
-
-			slog.Debug("Publishing discovery payload", "topic", topic)
-			_, err = client.Publish(ctx, &paho.Publish{
-				QoS:     1,
-				Retain:  true,
-				Topic:   DiscoveryTopic(conf, topic),
-				Payload: b,
-			})
-			return err
-		})
+	b, err := json.Marshal(payload)
+	if err != nil {
+		return err
 	}
 
-	return group.Wait()
+	topic := DiscoveryTopic(conf)
+	slog.Debug("Publishing discovery payload", "topic", topic)
+	_, err = client.Publish(ctx, &paho.Publish{
+		QoS:     1,
+		Retain:  true,
+		Topic:   topic,
+		Payload: b,
+	})
+	return err
 }
 
-func DiscoveryTopic(conf *config.Config, topic string) string {
-	return path.Join(conf.DiscoveryPrefix, "sensor", conf.TopicPrefix, topic, "config")
+func DiscoveryTopic(conf *config.Config) string {
+	return path.Join(conf.DiscoveryPrefix, "device", conf.TopicPrefix, "config")
 }
 
 const (
@@ -89,8 +82,8 @@ const (
 	TopicDewPoint         = "dew_point"
 )
 
-func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[string]map[string]any {
-	payloads := map[string]map[string]any{
+func generateDiscoveryPayload(cmd *cobra.Command, conf *config.Config) map[string]any {
+	components := map[string]map[string]any{
 		TopicTemperature: {
 			unitOfMeasurement:         unitFahrenheit,
 			deviceClass:               deviceClassTemperature,
@@ -202,27 +195,29 @@ func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[stri
 		},
 	}
 
-	availability := []map[string]any{{
-		"topic": conf.TopicPrefix + "/status",
-	}}
-	origin := map[string]any{
-		name:          "Ambient Fusion",
-		"sw":          cobrax.GetVersion(cmd),
-		"support_url": "https://github.com/gabe565/ambient-fusion",
-	}
-	device := map[string]any{
-		"identifiers": []string{conf.TopicPrefix},
-		name:          conf.DeviceName,
-		"sw_version":  cobrax.GetVersion(cmd),
-	}
-
-	for topic, sensor := range payloads {
-		sensor["availability"] = availability
-		sensor["origin"] = origin
-		sensor["device"] = device
+	for topic, sensor := range components {
+		sensor["platform"] = "sensor"
 		sensor["object_id"] = conf.TopicPrefix + "_" + topic
 		sensor["unique_id"] = conf.TopicPrefix + "_" + topic
 		sensor["state_topic"] = path.Join(conf.TopicPrefix, topic)
 	}
-	return payloads
+
+	payload := map[string]any{
+		"availability": []map[string]any{
+			{"topic": conf.TopicPrefix + "/status"},
+		},
+		"device": map[string]any{
+			"identifiers": []string{conf.TopicPrefix},
+			name:          conf.DeviceName,
+			"sw_version":  cobrax.GetVersion(cmd),
+		},
+		"origin": map[string]any{
+			name:          "Ambient Fusion",
+			"sw":          cobrax.GetVersion(cmd),
+			"support_url": "https://github.com/gabe565/ambient-fusion",
+		},
+		"components": components,
+	}
+
+	return payload
 }
