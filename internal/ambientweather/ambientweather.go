@@ -22,6 +22,7 @@ import (
 )
 
 var (
+	ErrUpstream        = errors.New("upstream returned an error")
 	ErrInvalidResponse = errors.New("invalid response")
 	ErrNoEntries       = errors.New("no entries passed sanitization")
 )
@@ -55,6 +56,10 @@ func Process(ctx context.Context, cmd *cobra.Command, conf *config.Config, clien
 		_, _ = io.Copy(io.Discard, res.Body)
 		_ = res.Body.Close()
 	}()
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("%w: %s", ErrUpstream, res.Status)
+	}
 
 	decoder := json.NewDecoder(res.Body)
 	for _, expect := range expectedTokens() {
