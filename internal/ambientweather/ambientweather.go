@@ -39,7 +39,11 @@ func Process(ctx context.Context, conf *config.Config, client *autopaho.Connecti
 		return err
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	httpClient := &http.Client{
+		Timeout: time.Minute,
+	}
+
+	res, err := httpClient.Do(req)
 	if err != nil {
 		return err
 	}
