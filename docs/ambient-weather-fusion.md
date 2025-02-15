@@ -15,6 +15,7 @@ ambient-weather-fusion [flags]
       --latitude float             Latitude of center
       --longitude float            Longitude of center
       --max-reading-age duration   Maximum age of a reading to be included (default 10m0s)
+      --mqtt-insecure              Skip MQTT TLS verification
       --mqtt-password string       MQTT password
       --mqtt-url string            MQTT server URL
       --mqtt-username string       MQTT username

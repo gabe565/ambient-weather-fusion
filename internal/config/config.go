@@ -21,9 +21,10 @@ type Config struct {
 	TopicPrefix     string
 	DeviceName      string
 
-	MQTTURL      pflagx.URL
-	MQTTUsername string
-	MQTTPassword string
+	MQTTURL                pflagx.URL
+	MQTTUsername           string
+	MQTTPassword           string
+	MQTTInsecureSkipVerify bool
 }
 
 func New() *Config {

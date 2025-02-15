@@ -16,6 +16,7 @@ const (
 	FlagMQTTURL      = "mqtt-url"
 	FlagMQTTUsername = "mqtt-username"
 	FlagMQTTPassword = "mqtt-password"
+	FlagMQTTInsecure = "mqtt-insecure"
 )
 
 func (c *Config) RegisterFlags(cmd *cobra.Command) {
@@ -33,4 +34,5 @@ func (c *Config) RegisterFlags(cmd *cobra.Command) {
 	fs.Var(&c.MQTTURL, FlagMQTTURL, "MQTT server URL")
 	fs.StringVar(&c.MQTTUsername, FlagMQTTUsername, c.MQTTUsername, "MQTT username")
 	fs.StringVar(&c.MQTTPassword, FlagMQTTPassword, c.MQTTPassword, "MQTT password")
+	fs.BoolVar(&c.MQTTInsecureSkipVerify, FlagMQTTInsecure, c.MQTTInsecureSkipVerify, "Skip MQTT TLS verification")
 }

@@ -2,6 +2,7 @@ package mqtt
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"log/slog"
 	"net/url"
@@ -15,6 +16,7 @@ import (
 func Connect(ctx context.Context, conf *config.Config) (*autopaho.ConnectionManager, error) {
 	cliCfg := autopaho.ClientConfig{
 		ServerUrls:            []*url.URL{conf.MQTTURL.URL},
+		TlsCfg:                &tls.Config{InsecureSkipVerify: conf.MQTTInsecureSkipVerify}, //nolint:gosec
 		KeepAlive:             20,
 		SessionExpiryInterval: 60,
 		OnConnectionUp: func(client *autopaho.ConnectionManager, _ *paho.Connack) {
