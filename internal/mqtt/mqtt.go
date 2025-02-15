@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/url"
+	"path"
 
 	"gabe565.com/ambient-weather-fusion/internal/config"
 	"github.com/eclipse/paho.golang/autopaho"
@@ -83,4 +84,8 @@ func Disconnect(ctx context.Context, conf *config.Config, client *autopaho.Conne
 	}
 
 	return errors.Join(errs...)
+}
+
+func DataTopic(conf *config.Config, topic string) string {
+	return path.Join(conf.TopicPrefix, topic)
 }

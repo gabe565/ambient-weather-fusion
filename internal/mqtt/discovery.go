@@ -15,156 +15,197 @@ import (
 )
 
 func PublishDiscovery(ctx context.Context, cmd *cobra.Command, conf *config.Config, client *autopaho.ConnectionManager) error {
-	availability := []map[string]any{{"topic": conf.TopicPrefix + "/status"}}
-	origin := map[string]any{
-		"name": "Ambient Fusion",
-		"sw":   cobrax.GetVersion(cmd),
-		"url":  "https://github.com/gabe565/ambient-fusion",
-	}
-	device := map[string]any{
-		"identifiers": []string{conf.TopicPrefix},
-		"name":        conf.DeviceName,
-		"sw_version":  cobrax.GetVersion(cmd),
-	}
-
 	var group errgroup.Group
 	group.SetLimit(4)
 
-	publish := func(topic string, data map[string]any) {
+	for topic, data := range generateDiscoveryPayloads(cmd, conf) {
 		group.Go(func() error {
-			data["availability"] = availability
-			data["origin"] = origin
-			data["device"] = device
-			data["object_id"] = conf.TopicPrefix + "_" + topic
-			data["unique_id"] = conf.TopicPrefix + "_" + topic
-			data["state_topic"] = path.Join(conf.TopicPrefix, topic)
-
 			b, err := json.Marshal(data)
 			if err != nil {
 				return err
 			}
 
-			topic := path.Join(conf.DiscoveryPrefix, "sensor", conf.TopicPrefix, topic, "config")
 			slog.Debug("Publishing discovery payload", "topic", topic)
 			_, err = client.Publish(ctx, &paho.Publish{
 				QoS:     1,
 				Retain:  true,
-				Topic:   topic,
+				Topic:   DiscoveryTopic(conf, topic),
 				Payload: b,
 			})
 			return err
 		})
 	}
 
-	publish("temperature", map[string]any{
-		"unit_of_measurement":         "°F",
-		"device_class":                "temperature",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("humidity", map[string]any{
-		"unit_of_measurement":         "%",
-		"device_class":                "humidity",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("wind_speed", map[string]any{
-		"unit_of_measurement":         "mph",
-		"device_class":                "wind_speed",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("wind_gust", map[string]any{
-		"name":                        "Wind gust",
-		"unit_of_measurement":         "mph",
-		"device_class":                "wind_speed",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("max_daily_gust", map[string]any{
-		"name":                        "Max daily gust",
-		"unit_of_measurement":         "mph",
-		"device_class":                "wind_speed",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("uv_index", map[string]any{
-		"name":                        "UV index",
-		"unit_of_measurement":         "index",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("solar_radiation", map[string]any{
-		"unit_of_measurement":         "W/m²",
-		"device_class":                "irradiance",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-		"enabled_by_default":          false,
-	})
-	publish("hourly_rain", map[string]any{
-		"name":                        "Hourly rain",
-		"unit_of_measurement":         "in/h",
-		"device_class":                "precipitation_intensity",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 2,
-	})
-	publish("daily_rain", map[string]any{
-		"name":                        "Daily rain",
-		"unit_of_measurement":         "in",
-		"device_class":                "precipitation",
-		"state_class":                 "total",
-		"suggested_display_precision": 2,
-	})
-	publish("weekly_rain", map[string]any{
-		"name":                        "Weekly rain",
-		"unit_of_measurement":         "in",
-		"device_class":                "precipitation",
-		"state_class":                 "total",
-		"suggested_display_precision": 2,
-		"enabled_by_default":          false,
-	})
-	publish("monthly_rain", map[string]any{
-		"name":                        "Monthly rain",
-		"unit_of_measurement":         "in",
-		"device_class":                "precipitation",
-		"state_class":                 "total",
-		"suggested_display_precision": 2,
-		"enabled_by_default":          false,
-	})
-	publish("relative_pressure", map[string]any{
-		"name":                        "Relative pressure",
-		"unit_of_measurement":         "inHg",
-		"device_class":                "pressure",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 2,
-	})
-	publish("absolute_pressure", map[string]any{
-		"name":                        "Absolute pressure",
-		"unit_of_measurement":         "inHg",
-		"device_class":                "pressure",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 2,
-		"enabled_by_default":          false,
-	})
-	publish("last_rain", map[string]any{
-		"name":               "Last rain",
-		"device_class":       "timestamp",
-		"enabled_by_default": false,
-	})
-	publish("feels_like", map[string]any{
-		"name":                        "Feels like",
-		"unit_of_measurement":         "°F",
-		"device_class":                "temperature",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-	publish("dew_point", map[string]any{
-		"name":                        "Dew point",
-		"unit_of_measurement":         "°F",
-		"device_class":                "temperature",
-		"state_class":                 "measurement",
-		"suggested_display_precision": 1,
-	})
-
 	return group.Wait()
+}
+
+func DiscoveryTopic(conf *config.Config, topic string) string {
+	return path.Join(conf.DiscoveryPrefix, "sensor", conf.TopicPrefix, topic, "config")
+}
+
+const (
+	name                      = "name"
+	unitOfMeasurement         = "unit_of_measurement"
+	deviceClass               = "device_class"
+	stateClass                = "state_class"
+	suggestedDisplayPrecision = "suggested_display_precision"
+	enabledByDefault          = "enabled_by_default"
+
+	unitFahrenheit      = "°F"
+	unitPercent         = "%"
+	unitMPH             = "mph"
+	unitInches          = "in"
+	unitInHg            = "inHg"
+	unitInchesPerHour   = "in/h"
+	unitWattsPerSqMeter = "W/m²"
+
+	deviceClassTemperature            = "temperature"
+	deviceClassHumidity               = "humidity"
+	deviceClassWindSpeed              = "wind_speed"
+	deviceClassPrecipitation          = "precipitation"
+	deviceClassPrecipitationIntensity = "precipitation_intensity"
+	deviceClassPressure               = "pressure"
+	deviceClassTimestamp              = "timestamp"
+	deviceClassIrradiance             = "irradiance"
+
+	stateClassMeasurement = "measurement"
+	stateClassTotal       = "total"
+)
+
+func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[string]map[string]any {
+	payloads := map[string]map[string]any{
+		"temperature": {
+			unitOfMeasurement:         unitFahrenheit,
+			deviceClass:               deviceClassTemperature,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"humidity": {
+			unitOfMeasurement:         unitPercent,
+			deviceClass:               deviceClassHumidity,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"wind_speed": {
+			unitOfMeasurement:         unitMPH,
+			deviceClass:               deviceClassWindSpeed,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"wind_gust": {
+			name:                      "Wind gust",
+			unitOfMeasurement:         unitMPH,
+			deviceClass:               deviceClassWindSpeed,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"max_daily_gust": {
+			name:                      "Max daily gust",
+			unitOfMeasurement:         unitMPH,
+			deviceClass:               deviceClassWindSpeed,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"uv_index": {
+			name:                      "UV index",
+			unitOfMeasurement:         "index",
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"solar_radiation": {
+			unitOfMeasurement:         unitWattsPerSqMeter,
+			deviceClass:               deviceClassIrradiance,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+			enabledByDefault:          false,
+		},
+		"hourly_rain": {
+			name:                      "Hourly rain",
+			unitOfMeasurement:         unitInchesPerHour,
+			deviceClass:               deviceClassPrecipitationIntensity,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 2,
+		},
+		"daily_rain": {
+			name:                      "Daily rain",
+			unitOfMeasurement:         unitInches,
+			deviceClass:               deviceClassPrecipitation,
+			stateClass:                stateClassTotal,
+			suggestedDisplayPrecision: 2,
+		},
+		"weekly_rain": {
+			name:                      "Weekly rain",
+			unitOfMeasurement:         unitInches,
+			deviceClass:               deviceClassPrecipitation,
+			stateClass:                stateClassTotal,
+			suggestedDisplayPrecision: 2,
+			enabledByDefault:          false,
+		},
+		"monthly_rain": {
+			name:                      "Monthly rain",
+			unitOfMeasurement:         unitInches,
+			deviceClass:               deviceClassPrecipitation,
+			stateClass:                stateClassTotal,
+			suggestedDisplayPrecision: 2,
+			enabledByDefault:          false,
+		},
+		"relative_pressure": {
+			name:                      "Relative pressure",
+			unitOfMeasurement:         unitInHg,
+			deviceClass:               deviceClassPressure,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 2,
+		},
+		"absolute_pressure": {
+			name:                      "Absolute pressure",
+			unitOfMeasurement:         unitInHg,
+			deviceClass:               deviceClassPressure,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 2,
+			enabledByDefault:          false,
+		},
+		"last_rain": {
+			name:             "Last rain",
+			deviceClass:      deviceClassTimestamp,
+			enabledByDefault: false,
+		},
+		"feels_like": {
+			name:                      "Feels like",
+			unitOfMeasurement:         unitFahrenheit,
+			deviceClass:               deviceClassTemperature,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+		"dew_point": {
+			name:                      "Dew point",
+			unitOfMeasurement:         unitFahrenheit,
+			deviceClass:               deviceClassTemperature,
+			stateClass:                stateClassMeasurement,
+			suggestedDisplayPrecision: 1,
+		},
+	}
+
+	availability := []map[string]any{{
+		"topic": conf.TopicPrefix + "/status",
+	}}
+	origin := map[string]any{
+		name:  "Ambient Fusion",
+		"sw":  cobrax.GetVersion(cmd),
+		"url": "https://github.com/gabe565/ambient-fusion",
+	}
+	device := map[string]any{
+		"identifiers": []string{conf.TopicPrefix},
+		name:          conf.DeviceName,
+		"sw_version":  cobrax.GetVersion(cmd),
+	}
+
+	for topic, sensor := range payloads {
+		sensor["availability"] = availability
+		sensor["origin"] = origin
+		sensor["device"] = device
+		sensor["object_id"] = conf.TopicPrefix + "_" + topic
+		sensor["unique_id"] = conf.TopicPrefix + "_" + topic
+		sensor["state_topic"] = path.Join(conf.TopicPrefix, topic)
+	}
+	return payloads
 }

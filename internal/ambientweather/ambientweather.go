@@ -8,11 +8,11 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"path"
 	"slices"
 	"time"
 
 	"gabe565.com/ambient-weather-fusion/internal/config"
+	"gabe565.com/ambient-weather-fusion/internal/mqtt"
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 	"golang.org/x/sync/errgroup"
@@ -95,10 +95,11 @@ func Process(ctx context.Context, conf *config.Config, client *autopaho.Connecti
 	var group errgroup.Group
 	group.SetLimit(4)
 
-	publish := func(topic string, value any) {
+	for topic, value := range generatePayloads(entries) {
 		if value == nil {
-			return
+			continue
 		}
+
 		group.Go(func() error {
 			var b []byte
 			switch topic {
@@ -115,34 +116,17 @@ func Process(ctx context.Context, conf *config.Config, client *autopaho.Connecti
 				}
 			}
 
-			topic := path.Join(conf.TopicPrefix, topic)
 			slog.Debug("Publishing data", "topic", topic, "value", string(b))
 			_, err = client.Publish(ctx, &paho.Publish{
 				QoS:     1,
 				Retain:  true,
-				Topic:   topic,
+				Topic:   mqtt.DataTopic(conf, topic),
 				Payload: b,
 			})
 			return err
 		})
 	}
 
-	publish("temperature", computeMedian(entries, func(data Data) float64 { return data.LastData.TempF }))
-	publish("humidity", computeMedian(entries, func(data Data) int { return data.LastData.Humidity }))
-	publish("wind_speed", computeMedian(entries, func(data Data) float64 { return data.LastData.WindSpeedMPH }))
-	publish("wind_gust", computeMedian(entries, func(data Data) float64 { return data.LastData.WindGustMPH }))
-	publish("max_daily_gust", computeMedian(entries, func(data Data) float64 { return data.LastData.MaxDailyGust }))
-	publish("uv_index", computeMedian(entries, func(data Data) int { return data.LastData.UV }))
-	publish("solar_radiation", computeMedian(entries, func(data Data) float64 { return data.LastData.SolarRadiation }))
-	publish("hourly_rain", computeMedian(entries, func(data Data) float64 { return data.LastData.HourlyRainIn }))
-	publish("daily_rain", computeMedian(entries, func(data Data) float64 { return data.LastData.DailyRainIn }))
-	publish("weekly_rain", computeMedian(entries, func(data Data) float64 { return data.LastData.WeeklyRainIn }))
-	publish("monthly_rain", computeMedian(entries, func(data Data) float64 { return data.LastData.MonthlyRainIn }))
-	publish("relative_pressure", computeMedian(entries, func(data Data) float64 { return data.LastData.PressureRelativeIn }))
-	publish("absolute_pressure", computeMedian(entries, func(data Data) float64 { return data.LastData.PressureAbsoluteIn }))
-	publish("last_rain", computeMedian(entries, func(data Data) int64 { return data.LastData.LastRain }))
-	publish("feels_like", computeMedian(entries, func(data Data) float64 { return data.LastData.FeelsLike }))
-	publish("dew_point", computeMedian(entries, func(data Data) float64 { return data.LastData.DewPoint }))
 	return group.Wait()
 }
 
@@ -167,4 +151,25 @@ func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) V) *V {
 		val = (vals[len(vals)/2-1] + vals[len(vals)/2]) / 2
 	}
 	return &val
+}
+
+func generatePayloads(entries []Data) map[string]any {
+	return map[string]any{
+		"temperature":       computeMedian(entries, func(data Data) float64 { return data.LastData.TempF }),
+		"humidity":          computeMedian(entries, func(data Data) int { return data.LastData.Humidity }),
+		"wind_speed":        computeMedian(entries, func(data Data) float64 { return data.LastData.WindSpeedMPH }),
+		"wind_gust":         computeMedian(entries, func(data Data) float64 { return data.LastData.WindGustMPH }),
+		"max_daily_gust":    computeMedian(entries, func(data Data) float64 { return data.LastData.MaxDailyGust }),
+		"uv_index":          computeMedian(entries, func(data Data) int { return data.LastData.UV }),
+		"solar_radiation":   computeMedian(entries, func(data Data) float64 { return data.LastData.SolarRadiation }),
+		"hourly_rain":       computeMedian(entries, func(data Data) float64 { return data.LastData.HourlyRainIn }),
+		"daily_rain":        computeMedian(entries, func(data Data) float64 { return data.LastData.DailyRainIn }),
+		"weekly_rain":       computeMedian(entries, func(data Data) float64 { return data.LastData.WeeklyRainIn }),
+		"monthly_rain":      computeMedian(entries, func(data Data) float64 { return data.LastData.MonthlyRainIn }),
+		"relative_pressure": computeMedian(entries, func(data Data) float64 { return data.LastData.PressureRelativeIn }),
+		"absolute_pressure": computeMedian(entries, func(data Data) float64 { return data.LastData.PressureAbsoluteIn }),
+		"last_rain":         computeMedian(entries, func(data Data) int64 { return data.LastData.LastRain }),
+		"feels_like":        computeMedian(entries, func(data Data) float64 { return data.LastData.FeelsLike }),
+		"dew_point":         computeMedian(entries, func(data Data) float64 { return data.LastData.DewPoint }),
+	}
 }
