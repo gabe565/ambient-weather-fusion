@@ -97,7 +97,6 @@ func Process(ctx context.Context, cmd *cobra.Command, conf *config.Config, clien
 			continue
 		}
 
-		ComputeValues(&entry)
 		entries = append(entries, entry)
 	}
 
@@ -183,8 +182,8 @@ func generatePayloads(entries []Data) map[string]any {
 		mqtt.TopicRelativePressure: computeMedian(entries, func(data Data) *float64 { return data.LastData.PressureRelativeIn }),
 		mqtt.TopicAbsolutePressure: computeMedian(entries, func(data Data) *float64 { return data.LastData.PressureAbsoluteIn }),
 		mqtt.TopicLastRain:         computeMedian(entries, func(data Data) *int64 { return data.LastData.LastRain }),
-		mqtt.TopicFeelsLike:        computeMedian(entries, func(data Data) *float64 { return data.LastData.FeelsLike }),
-		mqtt.TopicDewPoint:         computeMedian(entries, func(data Data) *float64 { return data.LastData.DewPoint }),
+		mqtt.TopicFeelsLike:        computeMedian(entries, func(data Data) *float64 { return data.LastData.GetFeelsLike() }),
+		mqtt.TopicDewPoint:         computeMedian(entries, func(data Data) *float64 { return data.LastData.GetDewPoint() }),
 	}
 }
 

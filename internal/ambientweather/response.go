@@ -1,5 +1,7 @@
 package ambientweather
 
+import "gabe565.com/ambient-weather-fusion/internal/climate"
+
 type Response struct {
 	Data []Data `json:"data"`
 }
@@ -28,6 +30,29 @@ type LastData struct {
 	LastRain           *int64   `json:"lastRain"`
 	FeelsLike          *float64 `json:"feelsLike,omitempty"`
 	DewPoint           *float64 `json:"dewPoint,omitempty"`
+}
+
+func (l *LastData) GetFeelsLike() *float64 {
+	if l.FeelsLike == nil && l.TempF != nil && l.Humidity != nil && l.WindGustMPH != nil {
+		feelsLike := climate.FeelsLikeF(
+			*l.TempF,
+			float64(*l.Humidity),
+			*l.WindGustMPH,
+		)
+		l.FeelsLike = &feelsLike
+	}
+	return l.FeelsLike
+}
+
+func (l *LastData) GetDewPoint() *float64 {
+	if l.DewPoint == nil && l.TempF != nil && l.Humidity != nil {
+		dewPoint := climate.DewPointF(
+			*l.TempF,
+			float64(*l.Humidity),
+		)
+		l.DewPoint = &dewPoint
+	}
+	return l.DewPoint
 }
 
 type Info struct {
