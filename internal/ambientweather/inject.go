@@ -5,17 +5,23 @@ import (
 )
 
 func ComputeValues(data *Data) {
-	if data.LastData.DewPoint == 0 {
-		data.LastData.DewPoint = climate.DewPointF(
-			data.LastData.TempF,
-			float64(data.LastData.Humidity),
-		)
+	if data.LastData.TempF == nil || data.LastData.Humidity == nil {
+		return
 	}
-	if data.LastData.FeelsLike == 0 {
-		data.LastData.FeelsLike = climate.FeelsLikeF(
-			data.LastData.TempF,
-			float64(data.LastData.Humidity),
-			data.LastData.WindSpeedMPH,
+
+	if data.LastData.DewPoint == nil {
+		dewPoint := climate.DewPointF(
+			*data.LastData.TempF,
+			float64(*data.LastData.Humidity),
 		)
+		data.LastData.DewPoint = &dewPoint
+	}
+	if data.LastData.FeelsLike == nil && data.LastData.WindGustMPH != nil {
+		feelsLike := climate.FeelsLikeF(
+			*data.LastData.TempF,
+			float64(*data.LastData.Humidity),
+			*data.LastData.WindGustMPH,
+		)
+		data.LastData.FeelsLike = &feelsLike
 	}
 }

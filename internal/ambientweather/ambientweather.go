@@ -74,7 +74,7 @@ func Process(ctx context.Context, cmd *cobra.Command, conf *config.Config, clien
 			continue
 		}
 
-		if entry.Info.Indoor || entry.LastData.TempF == 0 {
+		if entry.Info.Indoor == nil || *entry.Info.Indoor || entry.LastData.TempF == nil {
 			continue
 		}
 
@@ -138,11 +138,12 @@ func Process(ctx context.Context, cmd *cobra.Command, conf *config.Config, clien
 	return group.Wait()
 }
 
-func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) V) *V {
+func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) *V) *V {
 	vals := make([]V, 0, len(inputs))
 	for _, entry := range inputs {
-		val := fn(entry)
-		vals = append(vals, val)
+		if val := fn(entry); val != nil {
+			vals = append(vals, *val)
+		}
 	}
 
 	slices.Sort(vals)
@@ -163,22 +164,22 @@ func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) V) *V {
 
 func generatePayloads(entries []Data) map[string]any {
 	return map[string]any{
-		mqtt.TopicTemperature:      computeMedian(entries, func(data Data) float64 { return data.LastData.TempF }),
-		mqtt.TopicHumidity:         computeMedian(entries, func(data Data) int { return data.LastData.Humidity }),
-		mqtt.TopicWindSpeed:        computeMedian(entries, func(data Data) float64 { return data.LastData.WindSpeedMPH }),
-		mqtt.TopicWindGust:         computeMedian(entries, func(data Data) float64 { return data.LastData.WindGustMPH }),
-		mqtt.TopicMaxDailyGust:     computeMedian(entries, func(data Data) float64 { return data.LastData.MaxDailyGust }),
-		mqtt.TopicUVIndex:          computeMedian(entries, func(data Data) int { return data.LastData.UV }),
-		mqtt.TopicSolarRadiation:   computeMedian(entries, func(data Data) float64 { return data.LastData.SolarRadiation }),
-		mqtt.TopicHourlyRain:       computeMedian(entries, func(data Data) float64 { return data.LastData.HourlyRainIn }),
-		mqtt.TopicDailyRain:        computeMedian(entries, func(data Data) float64 { return data.LastData.DailyRainIn }),
-		mqtt.TopicWeeklyRain:       computeMedian(entries, func(data Data) float64 { return data.LastData.WeeklyRainIn }),
-		mqtt.TopicMonthlyRain:      computeMedian(entries, func(data Data) float64 { return data.LastData.MonthlyRainIn }),
-		mqtt.TopicRelativePressure: computeMedian(entries, func(data Data) float64 { return data.LastData.PressureRelativeIn }),
-		mqtt.TopicAbsolutePressure: computeMedian(entries, func(data Data) float64 { return data.LastData.PressureAbsoluteIn }),
-		mqtt.TopicLastRain:         computeMedian(entries, func(data Data) int64 { return data.LastData.LastRain }),
-		mqtt.TopicFeelsLike:        computeMedian(entries, func(data Data) float64 { return data.LastData.FeelsLike }),
-		mqtt.TopicDewPoint:         computeMedian(entries, func(data Data) float64 { return data.LastData.DewPoint }),
+		mqtt.TopicTemperature:      computeMedian(entries, func(data Data) *float64 { return data.LastData.TempF }),
+		mqtt.TopicHumidity:         computeMedian(entries, func(data Data) *int { return data.LastData.Humidity }),
+		mqtt.TopicWindSpeed:        computeMedian(entries, func(data Data) *float64 { return data.LastData.WindSpeedMPH }),
+		mqtt.TopicWindGust:         computeMedian(entries, func(data Data) *float64 { return data.LastData.WindGustMPH }),
+		mqtt.TopicMaxDailyGust:     computeMedian(entries, func(data Data) *float64 { return data.LastData.MaxDailyGust }),
+		mqtt.TopicUVIndex:          computeMedian(entries, func(data Data) *int { return data.LastData.UV }),
+		mqtt.TopicSolarRadiation:   computeMedian(entries, func(data Data) *float64 { return data.LastData.SolarRadiation }),
+		mqtt.TopicHourlyRain:       computeMedian(entries, func(data Data) *float64 { return data.LastData.HourlyRainIn }),
+		mqtt.TopicDailyRain:        computeMedian(entries, func(data Data) *float64 { return data.LastData.DailyRainIn }),
+		mqtt.TopicWeeklyRain:       computeMedian(entries, func(data Data) *float64 { return data.LastData.WeeklyRainIn }),
+		mqtt.TopicMonthlyRain:      computeMedian(entries, func(data Data) *float64 { return data.LastData.MonthlyRainIn }),
+		mqtt.TopicRelativePressure: computeMedian(entries, func(data Data) *float64 { return data.LastData.PressureRelativeIn }),
+		mqtt.TopicAbsolutePressure: computeMedian(entries, func(data Data) *float64 { return data.LastData.PressureAbsoluteIn }),
+		mqtt.TopicLastRain:         computeMedian(entries, func(data Data) *int64 { return data.LastData.LastRain }),
+		mqtt.TopicFeelsLike:        computeMedian(entries, func(data Data) *float64 { return data.LastData.FeelsLike }),
+		mqtt.TopicDewPoint:         computeMedian(entries, func(data Data) *float64 { return data.LastData.DewPoint }),
 	}
 }
 
