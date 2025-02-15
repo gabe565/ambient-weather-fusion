@@ -13,8 +13,11 @@ import (
 
 	"gabe565.com/ambient-weather-fusion/internal/config"
 	"gabe565.com/ambient-weather-fusion/internal/mqtt"
+	"gabe565.com/utils/cobrax"
+	"gabe565.com/utils/httpx"
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -33,14 +36,15 @@ func expectedTokens() []json.Token {
 
 var ErrInvalidType = errors.New("invalid type")
 
-func Process(ctx context.Context, conf *config.Config, client *autopaho.ConnectionManager) error {
+func Process(ctx context.Context, cmd *cobra.Command, conf *config.Config, client *autopaho.ConnectionManager) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, conf.BuildURL().String(), nil)
 	if err != nil {
 		return err
 	}
 
 	httpClient := &http.Client{
-		Timeout: time.Minute,
+		Transport: httpx.NewUserAgentTransport(nil, cobrax.BuildUserAgent(cmd)),
+		Timeout:   time.Minute,
 	}
 
 	res, err := httpClient.Do(req)

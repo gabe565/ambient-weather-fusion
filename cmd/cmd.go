@@ -80,7 +80,7 @@ func run(cmd *cobra.Command, _ []string) error {
 			return nil
 		case <-ticker.C:
 			ticker.Reset(5 * time.Minute)
-			if err := ambientweather.Process(ctx, conf, client); err != nil {
+			if err := ambientweather.Process(ctx, cmd, conf, client); err != nil {
 				slog.Error("Failed to process ambient-weather data", "error", err)
 			}
 		}
