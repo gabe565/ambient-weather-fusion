@@ -207,14 +207,14 @@ func generateDiscoveryPayload(cmd *cobra.Command, conf *config.Config) map[strin
 			{"topic": conf.TopicPrefix + "/status"},
 		},
 		"device": map[string]any{
-			"identifiers": []string{conf.TopicPrefix},
-			name:          conf.DeviceName,
-			"sw_version":  cobrax.GetVersion(cmd),
+			"ids": []string{conf.TopicPrefix},
+			name:  conf.DeviceName,
+			"sw":  cobrax.GetVersion(cmd),
 		},
 		"origin": map[string]any{
-			name:          "Ambient Fusion",
-			"sw":          cobrax.GetVersion(cmd),
-			"support_url": "https://github.com/gabe565/ambient-fusion",
+			name:  "Ambient Fusion",
+			"sw":  cobrax.GetVersion(cmd),
+			"url": "https://github.com/gabe565/ambient-fusion",
 		},
 		"components": components,
 	}
