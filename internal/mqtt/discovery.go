@@ -70,70 +70,87 @@ const (
 
 	stateClassMeasurement = "measurement"
 	stateClassTotal       = "total"
+
+	TopicTemperature      = "temperature"
+	TopicHumidity         = "humidity"
+	TopicWindSpeed        = "wind_speed"
+	TopicWindGust         = "wind_gust"
+	TopicMaxDailyGust     = "max_daily_gust"
+	TopicUVIndex          = "uv_index"
+	TopicSolarRadiation   = "solar_radiation"
+	TopicHourlyRain       = "hourly_rain"
+	TopicDailyRain        = "daily_rain"
+	TopicWeeklyRain       = "weekly_rain"
+	TopicMonthlyRain      = "monthly_rain"
+	TopicRelativePressure = "relative_pressure"
+	TopicAbsolutePressure = "absolute_pressure"
+	TopicLastRain         = "last_rain"
+	TopicFeelsLike        = "feels_like"
+	TopicDewPoint         = "dew_point"
 )
 
 func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[string]map[string]any {
 	payloads := map[string]map[string]any{
-		"temperature": {
+		TopicTemperature: {
 			unitOfMeasurement:         unitFahrenheit,
 			deviceClass:               deviceClassTemperature,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"humidity": {
+		TopicHumidity: {
 			unitOfMeasurement:         unitPercent,
 			deviceClass:               deviceClassHumidity,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"wind_speed": {
+		TopicWindSpeed: {
 			unitOfMeasurement:         unitMPH,
 			deviceClass:               deviceClassWindSpeed,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"wind_gust": {
+		TopicWindGust: {
 			name:                      "Wind gust",
 			unitOfMeasurement:         unitMPH,
 			deviceClass:               deviceClassWindSpeed,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"max_daily_gust": {
+		TopicMaxDailyGust: {
 			name:                      "Max daily gust",
 			unitOfMeasurement:         unitMPH,
 			deviceClass:               deviceClassWindSpeed,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"uv_index": {
+		TopicUVIndex: {
 			name:                      "UV index",
 			unitOfMeasurement:         "index",
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"solar_radiation": {
+		TopicSolarRadiation: {
 			unitOfMeasurement:         unitWattsPerSqMeter,
 			deviceClass:               deviceClassIrradiance,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 			enabledByDefault:          false,
 		},
-		"hourly_rain": {
+		TopicHourlyRain: {
 			name:                      "Hourly rain",
 			unitOfMeasurement:         unitInchesPerHour,
 			deviceClass:               deviceClassPrecipitationIntensity,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 2,
 		},
-		"daily_rain": {
+		TopicDailyRain: {
 			name:                      "Daily rain",
 			unitOfMeasurement:         unitInches,
 			deviceClass:               deviceClassPrecipitation,
 			stateClass:                stateClassTotal,
 			suggestedDisplayPrecision: 2,
 		},
-		"weekly_rain": {
+		TopicWeeklyRain: {
 			name:                      "Weekly rain",
 			unitOfMeasurement:         unitInches,
 			deviceClass:               deviceClassPrecipitation,
@@ -141,7 +158,7 @@ func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[stri
 			suggestedDisplayPrecision: 2,
 			enabledByDefault:          false,
 		},
-		"monthly_rain": {
+		TopicMonthlyRain: {
 			name:                      "Monthly rain",
 			unitOfMeasurement:         unitInches,
 			deviceClass:               deviceClassPrecipitation,
@@ -149,14 +166,14 @@ func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[stri
 			suggestedDisplayPrecision: 2,
 			enabledByDefault:          false,
 		},
-		"relative_pressure": {
+		TopicRelativePressure: {
 			name:                      "Relative pressure",
 			unitOfMeasurement:         unitInHg,
 			deviceClass:               deviceClassPressure,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 2,
 		},
-		"absolute_pressure": {
+		TopicAbsolutePressure: {
 			name:                      "Absolute pressure",
 			unitOfMeasurement:         unitInHg,
 			deviceClass:               deviceClassPressure,
@@ -164,19 +181,19 @@ func generateDiscoveryPayloads(cmd *cobra.Command, conf *config.Config) map[stri
 			suggestedDisplayPrecision: 2,
 			enabledByDefault:          false,
 		},
-		"last_rain": {
+		TopicLastRain: {
 			name:             "Last rain",
 			deviceClass:      deviceClassTimestamp,
 			enabledByDefault: false,
 		},
-		"feels_like": {
+		TopicFeelsLike: {
 			name:                      "Feels like",
 			unitOfMeasurement:         unitFahrenheit,
 			deviceClass:               deviceClassTemperature,
 			stateClass:                stateClassMeasurement,
 			suggestedDisplayPrecision: 1,
 		},
-		"dew_point": {
+		TopicDewPoint: {
 			name:                      "Dew point",
 			unitOfMeasurement:         unitFahrenheit,
 			deviceClass:               deviceClassTemperature,

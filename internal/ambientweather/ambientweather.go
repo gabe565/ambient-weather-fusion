@@ -103,7 +103,7 @@ func Process(ctx context.Context, conf *config.Config, client *autopaho.Connecti
 		group.Go(func() error {
 			var b []byte
 			switch topic {
-			case "last_rain":
+			case mqtt.TopicLastRain:
 				if i, ok := value.(*int64); ok {
 					ts := time.UnixMilli(*i)
 					b = []byte(ts.Format(time.RFC3339))
@@ -155,22 +155,22 @@ func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) V) *V {
 
 func generatePayloads(entries []Data) map[string]any {
 	return map[string]any{
-		"temperature":       computeMedian(entries, func(data Data) float64 { return data.LastData.TempF }),
-		"humidity":          computeMedian(entries, func(data Data) int { return data.LastData.Humidity }),
-		"wind_speed":        computeMedian(entries, func(data Data) float64 { return data.LastData.WindSpeedMPH }),
-		"wind_gust":         computeMedian(entries, func(data Data) float64 { return data.LastData.WindGustMPH }),
-		"max_daily_gust":    computeMedian(entries, func(data Data) float64 { return data.LastData.MaxDailyGust }),
-		"uv_index":          computeMedian(entries, func(data Data) int { return data.LastData.UV }),
-		"solar_radiation":   computeMedian(entries, func(data Data) float64 { return data.LastData.SolarRadiation }),
-		"hourly_rain":       computeMedian(entries, func(data Data) float64 { return data.LastData.HourlyRainIn }),
-		"daily_rain":        computeMedian(entries, func(data Data) float64 { return data.LastData.DailyRainIn }),
-		"weekly_rain":       computeMedian(entries, func(data Data) float64 { return data.LastData.WeeklyRainIn }),
-		"monthly_rain":      computeMedian(entries, func(data Data) float64 { return data.LastData.MonthlyRainIn }),
-		"relative_pressure": computeMedian(entries, func(data Data) float64 { return data.LastData.PressureRelativeIn }),
-		"absolute_pressure": computeMedian(entries, func(data Data) float64 { return data.LastData.PressureAbsoluteIn }),
-		"last_rain":         computeMedian(entries, func(data Data) int64 { return data.LastData.LastRain }),
-		"feels_like":        computeMedian(entries, func(data Data) float64 { return data.LastData.FeelsLike }),
-		"dew_point":         computeMedian(entries, func(data Data) float64 { return data.LastData.DewPoint }),
+		mqtt.TopicTemperature:      computeMedian(entries, func(data Data) float64 { return data.LastData.TempF }),
+		mqtt.TopicHumidity:         computeMedian(entries, func(data Data) int { return data.LastData.Humidity }),
+		mqtt.TopicWindSpeed:        computeMedian(entries, func(data Data) float64 { return data.LastData.WindSpeedMPH }),
+		mqtt.TopicWindGust:         computeMedian(entries, func(data Data) float64 { return data.LastData.WindGustMPH }),
+		mqtt.TopicMaxDailyGust:     computeMedian(entries, func(data Data) float64 { return data.LastData.MaxDailyGust }),
+		mqtt.TopicUVIndex:          computeMedian(entries, func(data Data) int { return data.LastData.UV }),
+		mqtt.TopicSolarRadiation:   computeMedian(entries, func(data Data) float64 { return data.LastData.SolarRadiation }),
+		mqtt.TopicHourlyRain:       computeMedian(entries, func(data Data) float64 { return data.LastData.HourlyRainIn }),
+		mqtt.TopicDailyRain:        computeMedian(entries, func(data Data) float64 { return data.LastData.DailyRainIn }),
+		mqtt.TopicWeeklyRain:       computeMedian(entries, func(data Data) float64 { return data.LastData.WeeklyRainIn }),
+		mqtt.TopicMonthlyRain:      computeMedian(entries, func(data Data) float64 { return data.LastData.MonthlyRainIn }),
+		mqtt.TopicRelativePressure: computeMedian(entries, func(data Data) float64 { return data.LastData.PressureRelativeIn }),
+		mqtt.TopicAbsolutePressure: computeMedian(entries, func(data Data) float64 { return data.LastData.PressureAbsoluteIn }),
+		mqtt.TopicLastRain:         computeMedian(entries, func(data Data) int64 { return data.LastData.LastRain }),
+		mqtt.TopicFeelsLike:        computeMedian(entries, func(data Data) float64 { return data.LastData.FeelsLike }),
+		mqtt.TopicDewPoint:         computeMedian(entries, func(data Data) float64 { return data.LastData.DewPoint }),
 	}
 }
 
