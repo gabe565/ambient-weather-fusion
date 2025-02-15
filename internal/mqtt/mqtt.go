@@ -14,24 +14,25 @@ import (
 )
 
 func Connect(ctx context.Context, conf *config.Config) (*autopaho.ConnectionManager, error) {
+	log := slog.With("url", conf.MQTTURL.String())
 	cliCfg := autopaho.ClientConfig{
 		ServerUrls:            []*url.URL{conf.MQTTURL.URL},
 		TlsCfg:                &tls.Config{InsecureSkipVerify: conf.MQTTInsecureSkipVerify}, //nolint:gosec
 		KeepAlive:             20,
 		SessionExpiryInterval: 60,
 		OnConnectionUp: func(client *autopaho.ConnectionManager, _ *paho.Connack) {
-			slog.Info("Connected to MQTT")
+			log.Info("Connected to MQTT")
 			if _, err := client.Publish(ctx, &paho.Publish{
 				QoS:     1,
 				Retain:  true,
 				Topic:   conf.TopicPrefix + "/status",
 				Payload: []byte("online"),
 			}); err != nil {
-				slog.Error("Failed to publish status message", "error", err)
+				log.Error("Failed to publish status message", "error", err)
 			}
 		},
 		OnConnectError: func(err error) {
-			slog.Error("Failed to connect to MQTT", "error", err)
+			log.Error("Failed to connect to MQTT", "error", err)
 		},
 		ConnectUsername: conf.MQTTUsername,
 		ConnectPassword: []byte(conf.MQTTPassword),
@@ -44,16 +45,16 @@ func Connect(ctx context.Context, conf *config.Config) (*autopaho.ConnectionMana
 		ClientConfig: paho.ClientConfig{
 			ClientID: conf.TopicPrefix,
 			OnClientError: func(err error) {
-				slog.Error("Client error", "error", err)
+				log.Error("Client error", "error", err)
 			},
 			OnServerDisconnect: func(d *paho.Disconnect) {
-				var log *slog.Logger
+				var disconnectLog *slog.Logger
 				if d.Properties != nil {
-					log = slog.With("reason", d.Properties.ReasonString)
+					disconnectLog = log.With("reason", d.Properties.ReasonString)
 				} else {
-					log = slog.With("reason", d.ReasonCode)
+					disconnectLog = log.With("reason", d.ReasonCode)
 				}
-				log.Info("Server requested disconnect")
+				disconnectLog.Info("Server requested disconnect")
 			},
 		},
 	}
