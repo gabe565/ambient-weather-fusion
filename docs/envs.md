@@ -8,7 +8,9 @@
 | `AW_LONGITUDE` | Longitude of center | `0` |
 | `AW_MAX_READING_AGE` | Maximum age of a reading to be included | `10m0s` |
 | `AW_MQTT_INSECURE` | Skip MQTT TLS verification | `false` |
+| `AW_MQTT_KEEP_ALIVE` | MQTT keep alive interval in seconds | `60` |
 | `AW_MQTT_PASSWORD` | MQTT password | ` ` |
+| `AW_MQTT_SESSION_EXPIRY` | MQTT session expiry interval in seconds | `60` |
 | `AW_MQTT_URL` | MQTT server URL | ` ` |
 | `AW_MQTT_USERNAME` | MQTT username | ` ` |
 | `AW_RADIUS` | Radius in miles | `4` |

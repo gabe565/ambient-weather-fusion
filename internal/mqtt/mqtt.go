@@ -18,8 +18,8 @@ func Connect(ctx context.Context, conf *config.Config) (*autopaho.ConnectionMana
 	cliCfg := autopaho.ClientConfig{
 		ServerUrls:            []*url.URL{conf.MQTTURL.URL},
 		TlsCfg:                &tls.Config{InsecureSkipVerify: conf.MQTTInsecureSkipVerify}, //nolint:gosec
-		KeepAlive:             20,
-		SessionExpiryInterval: 60,
+		KeepAlive:             conf.MQTTKeepAlive,
+		SessionExpiryInterval: conf.MQTTSessionExpiry,
 		OnConnectionUp: func(client *autopaho.ConnectionManager, _ *paho.Connack) {
 			log.Info("Connected to MQTT")
 			if _, err := client.Publish(ctx, &paho.Publish{
