@@ -199,7 +199,7 @@ func generateDiscoveryPayload(cmd *cobra.Command, conf *config.Config) map[strin
 		sensor["platform"] = "sensor"
 		sensor["object_id"] = conf.TopicPrefix + "_" + topic
 		sensor["unique_id"] = conf.TopicPrefix + "_" + topic
-		sensor["state_topic"] = path.Join(conf.TopicPrefix, topic)
+		sensor["value_template"] = "{{ value_json." + topic + " }}"
 	}
 
 	payload := map[string]any{
@@ -216,7 +216,8 @@ func generateDiscoveryPayload(cmd *cobra.Command, conf *config.Config) map[strin
 			"sw":  cobrax.GetVersion(cmd),
 			"url": "https://github.com/gabe565/ambient-fusion",
 		},
-		"components": components,
+		"state_topic": conf.TopicPrefix,
+		"components":  components,
 	}
 
 	return payload
