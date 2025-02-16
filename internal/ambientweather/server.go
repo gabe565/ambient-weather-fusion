@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 	"time"
 
 	"gabe565.com/ambient-weather-fusion/internal/config"
@@ -30,11 +31,13 @@ func NewServer(conf *config.Config, options ...Option) *Server {
 }
 
 type Server struct {
-	conf      *config.Config
-	mqtt      *autopaho.ConnectionManager
-	http      *http.Client
-	version   string
-	userAgent string
+	conf        *config.Config
+	mqtt        *autopaho.ConnectionManager
+	http        *http.Client
+	version     string
+	userAgent   string
+	lastPayload *Payload
+	mu          sync.Mutex
 }
 
 var (
@@ -138,17 +141,21 @@ func (s *Server) PublishStatus(ctx context.Context, online bool) error {
 		payload = "offline"
 	}
 
-	slog.Debug("Publishing status payload", "topic", s.conf.TopicPrefix, "payload", payload)
+	slog.Debug("Publishing status payload", "topic", s.conf.BaseTopic, "payload", payload)
 	_, err := s.mqtt.Publish(ctx, &paho.Publish{
 		QoS:     1,
 		Retain:  true,
-		Topic:   s.conf.TopicPrefix + "/status",
+		Topic:   s.conf.BaseTopic + "/status",
 		Payload: []byte(payload),
 	})
 	return err
 }
 
 func (s *Server) PublishData(ctx context.Context, retain bool, payload *Payload) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.lastPayload = payload
+
 	var b []byte
 	if payload != nil {
 		var err error
@@ -157,11 +164,11 @@ func (s *Server) PublishData(ctx context.Context, retain bool, payload *Payload)
 		}
 	}
 
-	slog.Debug("Publishing data payload", "topic", s.conf.TopicPrefix, "retain", retain, "payload", string(b))
+	slog.Debug("Publishing data payload", "topic", s.conf.BaseTopic, "retain", retain, "payload", string(b))
 	_, err := s.mqtt.Publish(ctx, &paho.Publish{
 		QoS:     1,
 		Retain:  retain,
-		Topic:   s.conf.TopicPrefix,
+		Topic:   s.conf.BaseTopic,
 		Payload: b,
 	})
 	return err

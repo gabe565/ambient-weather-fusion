@@ -31,11 +31,11 @@ func (s *Server) ConnectMQTT(ctx context.Context) error {
 		WillMessage: &paho.WillMessage{
 			QoS:     1,
 			Retain:  true,
-			Topic:   s.conf.TopicPrefix + "/status",
+			Topic:   s.conf.BaseTopic + "/status",
 			Payload: []byte("offline"),
 		},
 		ClientConfig: paho.ClientConfig{
-			ClientID: s.conf.TopicPrefix,
+			ClientID: s.conf.BaseTopic,
 			OnClientError: func(err error) {
 				log.Error("Client error", "error", err)
 			},

@@ -27,7 +27,7 @@ func (s *Server) PublishDiscovery(ctx context.Context) error {
 }
 
 func (s *Server) DiscoveryTopic() string {
-	return path.Join(s.conf.DiscoveryPrefix, "device", s.conf.TopicPrefix, "config")
+	return path.Join(s.conf.HADiscoveryTopic, "device", s.conf.BaseTopic, "config")
 }
 
 const (
@@ -191,18 +191,18 @@ func (s *Server) DiscoveryPayload() map[string]any {
 
 	for topic, sensor := range components {
 		sensor["platform"] = "sensor"
-		sensor["object_id"] = s.conf.TopicPrefix + "_" + topic
-		sensor["unique_id"] = s.conf.TopicPrefix + "_" + topic
+		sensor["object_id"] = s.conf.BaseTopic + "_" + topic
+		sensor["unique_id"] = s.conf.BaseTopic + "_" + topic
 		sensor["value_template"] = "{{ value_json." + topic + " }}"
 	}
 
 	payload := map[string]any{
 		"availability": []map[string]any{
-			{"topic": s.conf.TopicPrefix + "/status"},
+			{"topic": s.conf.BaseTopic + "/status"},
 		},
 		"device": map[string]any{
-			"ids": []string{s.conf.TopicPrefix},
-			name:  s.conf.DeviceName,
+			"ids": []string{s.conf.BaseTopic},
+			name:  s.conf.HADeviceName,
 			"sw":  s.version,
 		},
 		"origin": map[string]any{
@@ -210,7 +210,7 @@ func (s *Server) DiscoveryPayload() map[string]any {
 			"sw":  s.version,
 			"url": "https://github.com/gabe565/ambient-fusion",
 		},
-		"state_topic": s.conf.TopicPrefix,
+		"state_topic": s.conf.BaseTopic,
 		"components":  components,
 	}
 

@@ -15,16 +15,16 @@ type Config struct {
 	Limit         int
 	MaxReadingAge time.Duration
 
-	DiscoveryPrefix string
-	TopicPrefix     string
-	DeviceName      string
-
 	MQTTURL                pflagx.URL
 	MQTTUsername           string
 	MQTTPassword           string
 	MQTTInsecureSkipVerify bool
 	MQTTKeepAlive          uint16
 	MQTTSessionExpiry      uint32
+
+	BaseTopic        string
+	HADiscoveryTopic string
+	HADeviceName     string
 }
 
 func New() *Config {
@@ -36,13 +36,15 @@ func New() *Config {
 				Path:   "/devices",
 			},
 		},
-		Radius:            4,
-		Limit:             100,
-		MaxReadingAge:     10 * time.Minute,
-		DiscoveryPrefix:   "homeassistant",
-		TopicPrefix:       "ambient_weather_fusion",
-		DeviceName:        "Ambient Weather Fusion",
+		Radius:        4,
+		Limit:         100,
+		MaxReadingAge: 10 * time.Minute,
+
 		MQTTKeepAlive:     60,
 		MQTTSessionExpiry: 60,
+
+		BaseTopic:        "ambient_weather_fusion",
+		HADiscoveryTopic: "homeassistant",
+		HADeviceName:     "Ambient Weather Fusion",
 	}
 }
