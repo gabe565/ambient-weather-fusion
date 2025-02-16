@@ -22,6 +22,15 @@ func (s *Server) ConnectMQTT(ctx context.Context) error {
 			if err := s.PublishStatus(ctx, true); err != nil {
 				log.Error("Failed to publish status message", "error", err)
 			}
+			if s.conf.HAStatusTopic != "" {
+				if _, err := s.mqtt.Subscribe(ctx, &paho.Subscribe{
+					Subscriptions: []paho.SubscribeOptions{
+						{Topic: s.conf.HAStatusTopic, QoS: 1},
+					},
+				}); err != nil {
+					slog.Error("Failed to subscribe to Home Assistant status topic", "error", err)
+				}
+			}
 		},
 		OnConnectError: func(err error) {
 			log.Error("Failed to connect to MQTT", "error", err)
@@ -36,6 +45,17 @@ func (s *Server) ConnectMQTT(ctx context.Context) error {
 		},
 		ClientConfig: paho.ClientConfig{
 			ClientID: s.conf.BaseTopic,
+			OnPublishReceived: []func(received paho.PublishReceived) (bool, error){
+				func(r paho.PublishReceived) (bool, error) {
+					if r.Packet.Topic == s.conf.HAStatusTopic && string(r.Packet.Payload) == "online" {
+						if s.lastPayload == nil {
+							return true, nil
+						}
+						return true, s.PublishData(ctx, s.lastPayload)
+					}
+					return false, nil
+				},
+			},
 			OnClientError: func(err error) {
 				log.Error("Client error", "error", err)
 			},

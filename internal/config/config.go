@@ -24,6 +24,7 @@ type Config struct {
 
 	BaseTopic        string
 	HADiscoveryTopic string
+	HAStatusTopic    string
 	HADeviceName     string
 }
 
@@ -45,6 +46,7 @@ func New() *Config {
 
 		BaseTopic:        "ambient_weather_fusion",
 		HADiscoveryTopic: "homeassistant",
+		HAStatusTopic:    "homeassistant/status",
 		HADeviceName:     "Ambient Weather Fusion",
 	}
 }

@@ -18,6 +18,7 @@ const (
 
 	FlagBaseTopic        = "base-topic"
 	FlagHADiscoveryTopic = "ha-discovery-topic"
+	FlagHAStatusTopic    = "ha-status-topic"
 	FlagHADeviceName     = "ha-device-name"
 )
 
@@ -38,5 +39,6 @@ func (c *Config) RegisterFlags(cmd *cobra.Command) {
 
 	fs.StringVar(&c.BaseTopic, FlagBaseTopic, c.BaseTopic, "MQTT base topic")
 	fs.StringVar(&c.HADiscoveryTopic, FlagHADiscoveryTopic, c.HADiscoveryTopic, "Home Assistant discovery topic")
+	fs.StringVar(&c.HAStatusTopic, FlagHAStatusTopic, c.HAStatusTopic, "Home Assistant status topic")
 	fs.StringVar(&c.HADeviceName, FlagHADeviceName, c.HADeviceName, "Name of the device to add to Home Assistant")
 }

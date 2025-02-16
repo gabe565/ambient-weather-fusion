@@ -12,6 +12,7 @@ ambient-weather-fusion [flags]
       --base-topic string            MQTT base topic (default "ambient_weather_fusion")
       --ha-device-name string        Name of the device to add to Home Assistant (default "Ambient Weather Fusion")
       --ha-discovery-topic string    Home Assistant discovery topic (default "homeassistant")
+      --ha-status-topic string       Home Assistant status topic (default "homeassistant/status")
   -h, --help                         help for ambient-weather-fusion
       --latitude float               Latitude of center
       --longitude float              Longitude of center

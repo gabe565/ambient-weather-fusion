@@ -151,7 +151,7 @@ func (s *Server) PublishStatus(ctx context.Context, online bool) error {
 	return err
 }
 
-func (s *Server) PublishData(ctx context.Context, retain bool, payload *Payload) error {
+func (s *Server) PublishData(ctx context.Context, payload *Payload) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.lastPayload = payload
@@ -164,10 +164,9 @@ func (s *Server) PublishData(ctx context.Context, retain bool, payload *Payload)
 		}
 	}
 
-	slog.Debug("Publishing data payload", "topic", s.conf.BaseTopic, "retain", retain, "payload", string(b))
+	slog.Debug("Publishing data payload", "topic", s.conf.BaseTopic, "payload", string(b))
 	_, err := s.mqtt.Publish(ctx, &paho.Publish{
 		QoS:     1,
-		Retain:  retain,
 		Topic:   s.conf.BaseTopic,
 		Payload: b,
 	})
@@ -185,7 +184,6 @@ func (s *Server) Close(ctx context.Context) error {
 
 	return errors.Join(
 		s.PublishStatus(ctx, false),
-		s.PublishData(ctx, false, nil),
 		s.mqtt.Disconnect(ctx),
 	)
 }
@@ -196,7 +194,7 @@ func (s *Server) Tick(ctx context.Context) error {
 		return err
 	}
 
-	return s.PublishData(ctx, true, NewPayload(data))
+	return s.PublishData(ctx, NewPayload(data))
 }
 
 func (s *Server) Run(ctx context.Context) error {

@@ -5,6 +5,7 @@
 | `AW_BASE_TOPIC` | MQTT base topic | `ambient_weather_fusion` |
 | `AW_HA_DEVICE_NAME` | Name of the device to add to Home Assistant | `Ambient Weather Fusion` |
 | `AW_HA_DISCOVERY_TOPIC` | Home Assistant discovery topic | `homeassistant` |
+| `AW_HA_STATUS_TOPIC` | Home Assistant status topic | `homeassistant/status` |
 | `AW_LATITUDE` | Latitude of center | `0` |
 | `AW_LONGITUDE` | Longitude of center | `0` |
 | `AW_MAX_READING_AGE` | Maximum age of a reading to be included | `10m0s` |
