@@ -1,4 +1,4 @@
-package mqtt
+package ambientweather
 
 import (
 	"context"
@@ -6,24 +6,18 @@ import (
 	"log/slog"
 	"path"
 
-	"gabe565.com/ambient-weather-fusion/internal/config"
-	"gabe565.com/utils/cobrax"
-	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
-	"github.com/spf13/cobra"
 )
 
-func PublishDiscovery(ctx context.Context, cmd *cobra.Command, conf *config.Config, client *autopaho.ConnectionManager) error {
-	payload := generateDiscoveryPayload(cmd, conf)
-
-	b, err := json.Marshal(payload)
+func (s *Server) PublishDiscovery(ctx context.Context) error {
+	b, err := json.Marshal(s.DiscoveryPayload())
 	if err != nil {
 		return err
 	}
 
-	topic := DiscoveryTopic(conf)
+	topic := s.DiscoveryTopic()
 	slog.Debug("Publishing discovery payload", "topic", topic)
-	_, err = client.Publish(ctx, &paho.Publish{
+	_, err = s.mqtt.Publish(ctx, &paho.Publish{
 		QoS:     1,
 		Retain:  true,
 		Topic:   topic,
@@ -32,8 +26,8 @@ func PublishDiscovery(ctx context.Context, cmd *cobra.Command, conf *config.Conf
 	return err
 }
 
-func DiscoveryTopic(conf *config.Config) string {
-	return path.Join(conf.DiscoveryPrefix, "device", conf.TopicPrefix, "config")
+func (s *Server) DiscoveryTopic() string {
+	return path.Join(s.conf.DiscoveryPrefix, "device", s.conf.TopicPrefix, "config")
 }
 
 const (
@@ -82,7 +76,7 @@ const (
 	TopicDewPoint         = "dew_point"
 )
 
-func generateDiscoveryPayload(cmd *cobra.Command, conf *config.Config) map[string]any {
+func (s *Server) DiscoveryPayload() map[string]any {
 	components := map[string]map[string]any{
 		TopicTemperature: {
 			unitOfMeasurement:         unitFahrenheit,
@@ -197,26 +191,26 @@ func generateDiscoveryPayload(cmd *cobra.Command, conf *config.Config) map[strin
 
 	for topic, sensor := range components {
 		sensor["platform"] = "sensor"
-		sensor["object_id"] = conf.TopicPrefix + "_" + topic
-		sensor["unique_id"] = conf.TopicPrefix + "_" + topic
+		sensor["object_id"] = s.conf.TopicPrefix + "_" + topic
+		sensor["unique_id"] = s.conf.TopicPrefix + "_" + topic
 		sensor["value_template"] = "{{ value_json." + topic + " }}"
 	}
 
 	payload := map[string]any{
 		"availability": []map[string]any{
-			{"topic": conf.TopicPrefix + "/status"},
+			{"topic": s.conf.TopicPrefix + "/status"},
 		},
 		"device": map[string]any{
-			"ids": []string{conf.TopicPrefix},
-			name:  conf.DeviceName,
-			"sw":  cobrax.GetVersion(cmd),
+			"ids": []string{s.conf.TopicPrefix},
+			name:  s.conf.DeviceName,
+			"sw":  s.version,
 		},
 		"origin": map[string]any{
 			name:  "Ambient Fusion",
-			"sw":  cobrax.GetVersion(cmd),
+			"sw":  s.version,
 			"url": "https://github.com/gabe565/ambient-fusion",
 		},
-		"state_topic": conf.TopicPrefix,
+		"state_topic": s.conf.TopicPrefix,
 		"components":  components,
 	}
 

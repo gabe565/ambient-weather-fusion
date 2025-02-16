@@ -10,7 +10,6 @@ import (
 
 	"gabe565.com/ambient-weather-fusion/internal/ambientweather"
 	"gabe565.com/ambient-weather-fusion/internal/config"
-	"gabe565.com/ambient-weather-fusion/internal/mqtt"
 	"gabe565.com/utils/cobrax"
 	"github.com/spf13/cobra"
 )
@@ -53,38 +52,18 @@ func run(cmd *cobra.Command, _ []string) error {
 	ctx, cancel := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	defer cancel()
 
-	client, err := mqtt.Connect(ctx, conf)
-	if err != nil {
-		return err
-	}
+	server := ambientweather.NewServer(conf,
+		ambientweather.WithVersion(cobrax.GetVersion(cmd)),
+		ambientweather.WithUserAgent(cobrax.BuildUserAgent(cmd)),
+	)
 	defer func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		if err := ambientweather.Cleanup(ctx, conf, client); err != nil {
-			slog.Error("Failed to clean up ambient-weather payloads", "error", err)
-		}
-
-		if err := mqtt.Disconnect(ctx, conf, client); err != nil {
-			slog.Error("Failed to disconnect from mqtt", "error", err)
+		if err := server.Close(ctx); err != nil {
+			slog.Error("Failed to clean up retained data", "error", err)
 		}
 	}()
 
-	if err := mqtt.PublishDiscovery(ctx, cmd, conf, client); err != nil {
-		return err
-	}
-
-	ticker := time.NewTicker(1)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case <-ticker.C:
-			ticker.Reset(5 * time.Minute)
-			if err := ambientweather.Process(ctx, cmd, conf, client); err != nil {
-				slog.Error("Failed to process ambient-weather data", "error", err)
-			}
-		}
-	}
+	return server.Run(ctx)
 }

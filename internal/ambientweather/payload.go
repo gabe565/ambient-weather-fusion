@@ -48,8 +48,8 @@ func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) *V) *V 
 	return &val
 }
 
-func NewPayload(entries []Data) Payload {
-	p := Payload{
+func NewPayload(entries []Data) *Payload {
+	p := &Payload{
 		Temperature:      computeMedian(entries, func(data Data) *float64 { return data.LastData.TempF }),
 		Humidity:         computeMedian(entries, func(data Data) *int { return data.LastData.Humidity }),
 		WindSpeed:        computeMedian(entries, func(data Data) *float64 { return data.LastData.WindSpeedMPH }),
