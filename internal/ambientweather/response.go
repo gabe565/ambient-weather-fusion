@@ -33,11 +33,11 @@ type LastData struct {
 }
 
 func (l *LastData) GetFeelsLike() *float64 {
-	if l.FeelsLike == nil && l.TempF != nil && l.Humidity != nil && l.WindGustMPH != nil {
+	if l.FeelsLike == nil && l.TempF != nil && l.Humidity != nil && l.WindSpeedMPH != nil {
 		feelsLike := climate.FeelsLikeF(
 			*l.TempF,
 			float64(*l.Humidity),
-			*l.WindGustMPH,
+			*l.WindSpeedMPH,
 		)
 		l.FeelsLike = &feelsLike
 	}
