@@ -54,8 +54,6 @@ func TestDewPointC(t *testing.T) {
 		args args
 		want float64
 	}{
-		{"temperature 0", args{0, 70}, 0},
-		{"humidity 0", args{10, 0}, 0},
 		{"10C at 70%", args{10, 70}, 4.781382239595014},
 	}
 	for _, tt := range tests {
@@ -75,8 +73,6 @@ func TestDewPointF(t *testing.T) {
 		args args
 		want float64
 	}{
-		{"temperature 0", args{0, 70}, 0},
-		{"humidity 0", args{10, 0}, 0},
 		{"50F at 70%", args{50, 70}, 40.60648803127103},
 	}
 	for _, tt := range tests {
@@ -97,9 +93,6 @@ func TestFeelsLikeF(t *testing.T) {
 		args args
 		want float64
 	}{
-		{"temperature 0", args{0, 70, 10}, 0},
-		{"humidity 0", args{50, 0, 10}, 0},
-		{"wind speed 0", args{50, 70, 0}, 0},
 		{"50F, 70%, 10mph", args{50, 70, 10}, 50.0},
 		{"70F, 70%, 10mph", args{70, 70, 10}, 69.99000000000001},
 		{"40F, 70%, 10mph", args{40, 70, 10}, 33.64254827558847},
@@ -126,9 +119,6 @@ func TestFeelsLikeC(t *testing.T) {
 		args args
 		want float64
 	}{
-		{"temperature 0", args{0, 70, 16}, 0},
-		{"humidity 0", args{26, 0, 16}, 0},
-		{"wind speed 0", args{50, 70, 0}, 0},
 		{"50F, 70%, 10mph", args{26.6667, 90, 16.0934}, 30.190028154626233},
 	}
 	for _, tt := range tests {

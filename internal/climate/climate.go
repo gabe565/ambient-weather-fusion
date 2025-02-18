@@ -20,25 +20,15 @@ const (
 )
 
 func DewPointC(tempC, humidity float64) float64 {
-	switch {
-	case tempC == 0, humidity == 0:
-		return 0
-	default:
-		humidity = min(humidity, 100)
-		g := magnusA*tempC/(magnusB+tempC) + math.Log(humidity/100.0)
-		return magnusB * g / (magnusA - g)
-	}
+	humidity = min(humidity, 100)
+	g := magnusA*tempC/(magnusB+tempC) + math.Log(humidity/100.0)
+	return magnusB * g / (magnusA - g)
 }
 
 func DewPointF(tempF, humidity float64) float64 {
-	switch {
-	case tempF == 0, humidity == 0:
-		return 0
-	default:
-		tempC := FtoC(tempF)
-		dewPoint := DewPointC(tempC, humidity)
-		return CtoF(dewPoint)
-	}
+	tempC := FtoC(tempF)
+	dewPoint := DewPointC(tempC, humidity)
+	return CtoF(dewPoint)
 }
 
 func windChillF(tempF, windSpeedMPH float64) float64 {
@@ -73,8 +63,6 @@ func heatIndexF(tempF, humidity float64) float64 {
 
 func FeelsLikeF(tempF, humidity, windSpeedMPH float64) float64 {
 	switch {
-	case tempF == 0, humidity == 0, windSpeedMPH == 0:
-		return 0
 	case tempF < 50 && windSpeedMPH > 3:
 		return windChillF(tempF, windSpeedMPH)
 	case tempF > 68:
@@ -85,13 +73,8 @@ func FeelsLikeF(tempF, humidity, windSpeedMPH float64) float64 {
 }
 
 func FeelsLikeC(tempC, humidity, windSpeedKPH float64) float64 {
-	switch {
-	case tempC == 0, humidity == 0, windSpeedKPH == 0:
-		return 0
-	default:
-		tempF := CtoF(tempC)
-		windSpeedMPH := KPHtoMPH(windSpeedKPH)
-		feelsLikeF := FeelsLikeF(tempF, humidity, windSpeedMPH)
-		return FtoC(feelsLikeF)
-	}
+	tempF := CtoF(tempC)
+	windSpeedMPH := KPHtoMPH(windSpeedKPH)
+	feelsLikeF := FeelsLikeF(tempF, humidity, windSpeedMPH)
+	return FtoC(feelsLikeF)
 }
