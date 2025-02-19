@@ -37,9 +37,8 @@ func windChillF(tempF, windSpeedMPH float64) float64 {
 }
 
 func heatIndexF(tempF, humidity float64) float64 {
-	result := 0.5 * (tempF + 61 + (tempF-68)*1.2 + humidity*0.094)
 	if tempF < 80 {
-		return result
+		return 0.5 * (tempF + 61 + (tempF-68)*1.2 + humidity*0.094)
 	}
 
 	base := -42.379 +
