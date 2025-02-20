@@ -68,7 +68,7 @@ func NewPayload(entries []Data) *Payload {
 	}
 
 	if unix := computeMedian(entries, func(data Data) *int64 { return data.LastData.LastRain }); unix != nil {
-		timestamp := time.UnixMilli(*unix).Format(time.RFC3339)
+		timestamp := time.UnixMilli(*unix).UTC().Format(time.RFC3339)
 		p.LastRain = &timestamp
 	}
 
