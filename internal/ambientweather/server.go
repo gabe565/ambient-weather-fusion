@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"gabe565.com/ambient-weather-fusion/internal/config"
-	"gabe565.com/ambient-weather-fusion/internal/location"
+	"gabe565.com/ambient-weather-fusion/pkg/geolocation"
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 )
@@ -57,12 +57,13 @@ func expectedTokens() []json.Token {
 func (s *Server) BuildURL() *url.URL {
 	u := *s.conf.RequestURL.URL
 	q := u.Query()
-	lat1, lon1 := location.Shift(s.conf.Latitude, s.conf.Longitude, -s.conf.Radius, -s.conf.Radius)
-	lat2, lon2 := location.Shift(s.conf.Latitude, s.conf.Longitude, s.conf.Radius, s.conf.Radius)
-	q.Set("$publicBox[0][0]", strconv.FormatFloat(lon1, 'f', -1, 64))
-	q.Set("$publicBox[0][1]", strconv.FormatFloat(lat1, 'f', -1, 64))
-	q.Set("$publicBox[1][0]", strconv.FormatFloat(lon2, 'f', -1, 64))
-	q.Set("$publicBox[1][1]", strconv.FormatFloat(lat2, 'f', -1, 64))
+	center := geolocation.Pt(s.conf.Latitude, s.conf.Longitude)
+	pt := center.Shift(-s.conf.Radius, -s.conf.Radius)
+	q.Set("$publicBox[0][0]", strconv.FormatFloat(pt.Longitude, 'f', -1, 64))
+	q.Set("$publicBox[0][1]", strconv.FormatFloat(pt.Latitude, 'f', -1, 64))
+	pt = center.Shift(s.conf.Radius, s.conf.Radius)
+	q.Set("$publicBox[1][0]", strconv.FormatFloat(pt.Longitude, 'f', -1, 64))
+	q.Set("$publicBox[1][1]", strconv.FormatFloat(pt.Latitude, 'f', -1, 64))
 	q.Set("$limit", strconv.Itoa(s.conf.Limit))
 	u.RawQuery = q.Encode()
 	return &u

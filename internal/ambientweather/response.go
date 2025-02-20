@@ -1,6 +1,6 @@
 package ambientweather
 
-import "gabe565.com/ambient-weather-fusion/internal/climate"
+import "gabe565.com/ambient-weather-fusion/pkg/climate"
 
 type Response struct {
 	Data []Data `json:"data"`
@@ -34,11 +34,7 @@ type LastData struct {
 
 func (l *LastData) GetFeelsLike() *float64 {
 	if l.FeelsLike == nil && l.TempF != nil && l.Humidity != nil && l.WindSpeedMPH != nil {
-		feelsLike := climate.FeelsLikeF(
-			*l.TempF,
-			float64(*l.Humidity),
-			*l.WindSpeedMPH,
-		)
+		feelsLike := climate.FeelsLikeF(*l.TempF, *l.Humidity, *l.WindSpeedMPH)
 		l.FeelsLike = &feelsLike
 	}
 	return l.FeelsLike
@@ -46,10 +42,7 @@ func (l *LastData) GetFeelsLike() *float64 {
 
 func (l *LastData) GetDewPoint() *float64 {
 	if l.DewPoint == nil && l.TempF != nil && l.Humidity != nil {
-		dewPoint := climate.DewPointF(
-			*l.TempF,
-			float64(*l.Humidity),
-		)
+		dewPoint := climate.DewPointF(*l.TempF, *l.Humidity)
 		l.DewPoint = &dewPoint
 	}
 	return l.DewPoint
