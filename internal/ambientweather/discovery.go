@@ -206,9 +206,9 @@ func (s *Server) DiscoveryPayload() map[string]any {
 			"sw":  s.version,
 		},
 		"origin": map[string]any{
-			name:  "Ambient Fusion",
+			name:  "Ambient Weather Fusion",
 			"sw":  s.version,
-			"url": "https://github.com/gabe565/ambient-fusion",
+			"url": "https://github.com/gabe565/ambient-weather-fusion",
 		},
 		"state_topic": s.conf.BaseTopic,
 		"components":  components,
