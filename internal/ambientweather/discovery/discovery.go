@@ -1,6 +1,8 @@
 package discovery
 
 import (
+	"path"
+
 	"gabe565.com/ambient-weather-fusion/internal/config"
 	"k8s.io/utils/ptr"
 )
@@ -143,7 +145,7 @@ func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
 	}
 
 	return Payload{
-		AvailabilityTopic: conf.BaseTopic + "/status",
+		AvailabilityTopic: path.Join(conf.BaseTopic, "status"),
 		Device: Device{
 			Identifiers: conf.BaseTopic,
 			Name:        conf.HADeviceName,
