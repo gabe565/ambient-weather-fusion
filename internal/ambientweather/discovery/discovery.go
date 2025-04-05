@@ -1,203 +1,160 @@
 package discovery
 
-import "gabe565.com/ambient-weather-fusion/internal/config"
-
-const (
-	availabilityTopic = "avty_t"
-	device            = "dev"
-	identifiers       = "ids"
-	swVersion         = "sw"
-	origin            = "o"
-	supportURL        = "url"
-	stateTopic        = "stat_t"
-	components        = "cmps"
-
-	name                      = "name"
-	platform                  = "p"
-	objectID                  = "obj_id"
-	uniqueID                  = "uniq_id"
-	valueTemplate             = "val_tpl"
-	unitOfMeasurement         = "unit_of_meas"
-	deviceClass               = "dev_cla"
-	stateClass                = "stat_cla"
-	suggestedDisplayPrecision = "sug_dsp_prc"
-	enabledByDefault          = "en"
-	icon                      = "ic"
-
-	unitFahrenheit      = "°F"
-	unitPercent         = "%"
-	unitMPH             = "mph"
-	unitInches          = "in"
-	unitInHg            = "inHg"
-	unitInchesPerHour   = "in/h"
-	unitWattsPerSqMeter = "W/m²"
-
-	deviceClassTemperature            = "temperature"
-	deviceClassHumidity               = "humidity"
-	deviceClassWindSpeed              = "wind_speed"
-	deviceClassPrecipitation          = "precipitation"
-	deviceClassPrecipitationIntensity = "precipitation_intensity"
-	deviceClassPressure               = "pressure"
-	deviceClassTimestamp              = "timestamp"
-	deviceClassIrradiance             = "irradiance"
-
-	stateClassMeasurement = "measurement"
-	stateClassTotal       = "total"
-
-	TopicTemperature      = "temperature"
-	TopicHumidity         = "humidity"
-	TopicWindSpeed        = "wind_speed"
-	TopicWindGust         = "wind_gust"
-	TopicMaxDailyGust     = "max_daily_gust"
-	TopicUVIndex          = "uv_index"
-	TopicSolarRadiation   = "solar_radiation"
-	TopicHourlyRain       = "hourly_rain"
-	TopicDailyRain        = "daily_rain"
-	TopicWeeklyRain       = "weekly_rain"
-	TopicMonthlyRain      = "monthly_rain"
-	TopicRelativePressure = "relative_pressure"
-	TopicAbsolutePressure = "absolute_pressure"
-	TopicLastRain         = "last_rain"
-	TopicFeelsLike        = "feels_like"
-	TopicDewPoint         = "dew_point"
+import (
+	"gabe565.com/ambient-weather-fusion/internal/config"
+	"k8s.io/utils/ptr"
 )
 
-func NewPayload(conf *config.Config, version string) map[string]any { //nolint:funlen
-	c := map[string]map[string]any{
+func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
+	components := map[Topic]Component{
 		TopicTemperature: {
-			unitOfMeasurement:         unitFahrenheit,
-			deviceClass:               deviceClassTemperature,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			UnitOfMeasurement:         UnitFahrenheit,
+			DeviceClass:               DeviceClassTemperature,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicHumidity: {
-			unitOfMeasurement:         unitPercent,
-			deviceClass:               deviceClassHumidity,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			UnitOfMeasurement:         UnitPercent,
+			DeviceClass:               DeviceClassHumidity,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicWindSpeed: {
-			unitOfMeasurement:         unitMPH,
-			deviceClass:               deviceClassWindSpeed,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			UnitOfMeasurement:         UnitMPH,
+			DeviceClass:               DeviceClassWindSpeed,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicWindGust: {
-			name:                      "Wind gust",
-			unitOfMeasurement:         unitMPH,
-			deviceClass:               deviceClassWindSpeed,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			Name:                      "Wind gust",
+			UnitOfMeasurement:         UnitMPH,
+			DeviceClass:               DeviceClassWindSpeed,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicMaxDailyGust: {
-			name:                      "Max daily gust",
-			unitOfMeasurement:         unitMPH,
-			deviceClass:               deviceClassWindSpeed,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			Name:                      "Max daily gust",
+			UnitOfMeasurement:         UnitMPH,
+			DeviceClass:               DeviceClassWindSpeed,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicUVIndex: {
-			name:                      "UV index",
-			unitOfMeasurement:         "index",
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			Name:                      "UV index",
+			UnitOfMeasurement:         UnitIndex,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicSolarRadiation: {
-			unitOfMeasurement:         unitWattsPerSqMeter,
-			deviceClass:               deviceClassIrradiance,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
-			enabledByDefault:          false,
+			Platform:                  PlatformSensor,
+			UnitOfMeasurement:         UnitWattsPerSqMeter,
+			DeviceClass:               DeviceClassIrradiance,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
+			EnabledByDefault:          ptr.To(false),
 		},
 		TopicHourlyRain: {
-			name:                      "Hourly rain",
-			unitOfMeasurement:         unitInchesPerHour,
-			deviceClass:               deviceClassPrecipitationIntensity,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 2,
+			Platform:                  PlatformSensor,
+			Name:                      "Hourly rain",
+			UnitOfMeasurement:         UnitInchesPerHour,
+			DeviceClass:               DeviceClassPrecipitationIntensity,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 2,
 		},
 		TopicDailyRain: {
-			name:                      "Daily rain",
-			unitOfMeasurement:         unitInches,
-			deviceClass:               deviceClassPrecipitation,
-			stateClass:                stateClassTotal,
-			suggestedDisplayPrecision: 2,
+			Platform:                  PlatformSensor,
+			Name:                      "Daily rain",
+			UnitOfMeasurement:         UnitInches,
+			DeviceClass:               DeviceClassPrecipitation,
+			StateClass:                StateClassTotal,
+			SuggestedDisplayPrecision: 2,
 		},
 		TopicWeeklyRain: {
-			name:                      "Weekly rain",
-			unitOfMeasurement:         unitInches,
-			deviceClass:               deviceClassPrecipitation,
-			stateClass:                stateClassTotal,
-			suggestedDisplayPrecision: 2,
-			enabledByDefault:          false,
+			Platform:                  PlatformSensor,
+			Name:                      "Weekly rain",
+			UnitOfMeasurement:         UnitInches,
+			DeviceClass:               DeviceClassPrecipitation,
+			StateClass:                StateClassTotal,
+			SuggestedDisplayPrecision: 2,
+			EnabledByDefault:          ptr.To(false),
 		},
 		TopicMonthlyRain: {
-			name:                      "Monthly rain",
-			unitOfMeasurement:         unitInches,
-			deviceClass:               deviceClassPrecipitation,
-			stateClass:                stateClassTotal,
-			suggestedDisplayPrecision: 2,
-			enabledByDefault:          false,
+			Platform:                  PlatformSensor,
+			Name:                      "Monthly rain",
+			UnitOfMeasurement:         UnitInches,
+			DeviceClass:               DeviceClassPrecipitation,
+			StateClass:                StateClassTotal,
+			SuggestedDisplayPrecision: 2,
+			EnabledByDefault:          ptr.To(false),
 		},
 		TopicRelativePressure: {
-			name:                      "Relative pressure",
-			unitOfMeasurement:         unitInHg,
-			deviceClass:               deviceClassPressure,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 2,
+			Platform:                  PlatformSensor,
+			Name:                      "Relative pressure",
+			UnitOfMeasurement:         UnitInHg,
+			DeviceClass:               DeviceClassPressure,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 2,
 		},
 		TopicAbsolutePressure: {
-			name:                      "Absolute pressure",
-			unitOfMeasurement:         unitInHg,
-			deviceClass:               deviceClassPressure,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 2,
-			enabledByDefault:          false,
+			Platform:                  PlatformSensor,
+			Name:                      "Absolute pressure",
+			UnitOfMeasurement:         UnitInHg,
+			DeviceClass:               DeviceClassPressure,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 2,
+			EnabledByDefault:          ptr.To(false),
 		},
 		TopicLastRain: {
-			name:             "Last rain",
-			deviceClass:      deviceClassTimestamp,
-			enabledByDefault: false,
-			icon:             "mdi:water",
+			Platform:         PlatformSensor,
+			Name:             "Last rain",
+			DeviceClass:      DeviceClassTimestamp,
+			EnabledByDefault: ptr.To(false),
+			Icon:             "mdi:water",
 		},
 		TopicFeelsLike: {
-			name:                      "Feels like",
-			unitOfMeasurement:         unitFahrenheit,
-			deviceClass:               deviceClassTemperature,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			Name:                      "Feels like",
+			UnitOfMeasurement:         UnitFahrenheit,
+			DeviceClass:               DeviceClassTemperature,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 		TopicDewPoint: {
-			name:                      "Dew point",
-			unitOfMeasurement:         unitFahrenheit,
-			deviceClass:               deviceClassTemperature,
-			stateClass:                stateClassMeasurement,
-			suggestedDisplayPrecision: 1,
+			Platform:                  PlatformSensor,
+			Name:                      "Dew point",
+			UnitOfMeasurement:         UnitFahrenheit,
+			DeviceClass:               DeviceClassTemperature,
+			StateClass:                StateClassMeasurement,
+			SuggestedDisplayPrecision: 1,
 		},
 	}
 
-	for topic, sensor := range c {
-		sensor[platform] = "sensor"
-		sensor[objectID] = conf.BaseTopic + "_" + topic
-		sensor[uniqueID] = conf.BaseTopic + "_" + topic
-		sensor[valueTemplate] = "{{ value_json." + topic + " }}"
+	for topic, sensor := range components {
+		sensor.ObjectID = conf.BaseTopic + "_" + string(topic)
+		sensor.UniqueID = conf.BaseTopic + "_" + string(topic)
+		sensor.ValueTemplate = "{{ value_json." + string(topic) + " }}"
+		components[topic] = sensor
 	}
 
-	payload := map[string]any{
-		availabilityTopic: conf.BaseTopic + "/status",
-		device: map[string]any{
-			identifiers: conf.BaseTopic,
-			name:        conf.HADeviceName,
-			swVersion:   version,
+	return Payload{
+		AvailabilityTopic: conf.BaseTopic + "/status",
+		Device: Device{
+			Identifiers: conf.BaseTopic,
+			Name:        conf.HADeviceName,
+			SWVersion:   version,
 		},
-		origin: map[string]any{
-			name:       "Ambient Weather Fusion",
-			swVersion:  version,
-			supportURL: "https://github.com/gabe565/ambient-weather-fusion",
+		Origin: Origin{
+			Name:       "Ambient Weather Fusion",
+			SWVersion:  version,
+			SupportURL: "https://github.com/gabe565/ambient-weather-fusion",
 		},
-		stateTopic: conf.BaseTopic,
-		components: c,
+		StateTopic: conf.BaseTopic,
+		Components: components,
 	}
-
-	return payload
 }
