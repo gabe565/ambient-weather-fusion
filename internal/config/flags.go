@@ -35,7 +35,9 @@ func (c *Config) RegisterFlags(cmd *cobra.Command) {
 	fs.StringVar(&c.MQTTPassword, FlagMQTTPassword, c.MQTTPassword, "MQTT password")
 	fs.BoolVar(&c.MQTTInsecureSkipVerify, FlagMQTTInsecure, c.MQTTInsecureSkipVerify, "Skip MQTT TLS verification")
 	fs.Uint16Var(&c.MQTTKeepAlive, FlagMQTTKeepAlive, c.MQTTKeepAlive, "MQTT keep alive interval in seconds")
-	fs.Uint32Var(&c.MQTTSessionExpiry, FlagMQTTSessionExpiry, c.MQTTSessionExpiry, "MQTT session expiry interval in seconds")
+	fs.Uint32Var(&c.MQTTSessionExpiry, FlagMQTTSessionExpiry, c.MQTTSessionExpiry,
+		"MQTT session expiry interval in seconds",
+	)
 
 	fs.StringVar(&c.BaseTopic, FlagBaseTopic, c.BaseTopic, "MQTT base topic")
 	fs.StringVar(&c.HADiscoveryTopic, FlagHADiscoveryTopic, c.HADiscoveryTopic, "Home Assistant discovery topic")

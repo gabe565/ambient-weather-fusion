@@ -48,7 +48,11 @@ func HeatIndexF[Temp, Humidity constraints.Number](tempF Temp, humidity Humidity
 }
 
 // FeelsLikeF computes the feels-like temperature in Fahrenheit.
-func FeelsLikeF[Temp, Humidity, WindSpeed constraints.Number](tempF Temp, humidity Humidity, windSpeedMPH WindSpeed) float64 {
+func FeelsLikeF[Temp, Humidity, WindSpeed constraints.Number](
+	tempF Temp,
+	humidity Humidity,
+	windSpeedMPH WindSpeed,
+) float64 {
 	switch {
 	case tempF <= 50 && windSpeedMPH > 3:
 		return WindChillF(tempF, windSpeedMPH)

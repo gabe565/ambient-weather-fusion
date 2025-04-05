@@ -36,7 +36,11 @@ func HeatIndexC[Temp, Humidity constraints.Number](tempC Temp, humidity Humidity
 }
 
 // FeelsLikeC computes the feels-like temperature in Celsius.
-func FeelsLikeC[Temp, Humidity, WindSpeed constraints.Number](tempC Temp, humidity Humidity, windSpeedKMH WindSpeed) float64 {
+func FeelsLikeC[Temp, Humidity, WindSpeed constraints.Number](
+	tempC Temp,
+	humidity Humidity,
+	windSpeedKMH WindSpeed,
+) float64 {
 	tempF := CtoF(tempC)
 	windSpeedMPH := KMHtoMPH(windSpeedKMH)
 	feelsLikeF := FeelsLikeF(tempF, humidity, windSpeedMPH)

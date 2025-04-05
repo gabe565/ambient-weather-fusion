@@ -41,7 +41,8 @@ func run(cmd *cobra.Command, _ []string) error {
 		panic("command missing config")
 	}
 
-	if conf.Latitude == 0 || conf.Longitude == 0 || conf.Radius == 0 || conf.BaseTopic == "" || conf.MQTTURL.URL == nil {
+	if conf.Latitude == 0 || conf.Longitude == 0 || conf.Radius == 0 || conf.BaseTopic == "" ||
+		conf.MQTTURL.URL == nil {
 		return cmd.Help()
 	}
 

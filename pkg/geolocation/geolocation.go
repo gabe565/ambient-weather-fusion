@@ -56,7 +56,7 @@ func (p Point) ShiftPoint(q Point) Point {
 	).Degrees()
 }
 
-// Shift is shorthand for Point.ShiftPoint(Pt(Latitude, Longitude))
+// Shift is shorthand for Point.ShiftPoint(Pt(Latitude, Longitude)).
 func (p Point) Shift(latDelta, longDelta float64) Point {
 	return p.ShiftPoint(Pt(latDelta, longDelta))
 }

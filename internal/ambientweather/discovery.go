@@ -76,7 +76,7 @@ const (
 	TopicDewPoint         = "dew_point"
 )
 
-func (s *Server) DiscoveryPayload() map[string]any {
+func (s *Server) DiscoveryPayload() map[string]any { //nolint:funlen
 	components := map[string]map[string]any{
 		TopicTemperature: {
 			unitOfMeasurement:         unitFahrenheit,
