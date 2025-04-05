@@ -37,6 +37,7 @@ const (
 	stateClass                = "state_class"
 	suggestedDisplayPrecision = "suggested_display_precision"
 	enabledByDefault          = "enabled_by_default"
+	icon                      = "icon"
 
 	unitFahrenheit      = "°F"
 	unitPercent         = "%"
@@ -172,6 +173,7 @@ func (s *Server) DiscoveryPayload() map[string]any { //nolint:funlen
 			name:             "Last rain",
 			deviceClass:      deviceClassTimestamp,
 			enabledByDefault: false,
+			icon:             "mdi:water",
 		},
 		TopicFeelsLike: {
 			name:                      "Feels like",
