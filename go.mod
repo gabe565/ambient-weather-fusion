@@ -1,6 +1,6 @@
 module gabe565.com/ambient-weather-fusion
 
-go 1.24.2
+go 1.24.6
 
 require (
 	gabe565.com/utils v0.0.0-20250302063333-ede73b14282c
