@@ -18,6 +18,7 @@ type Config struct {
 	MQTTURL                pflagx.URL
 	MQTTUsername           string
 	MQTTPassword           string
+	MQTTCAPath             string
 	MQTTInsecureSkipVerify bool
 	MQTTKeepAlive          uint16
 	MQTTSessionExpiry      uint32

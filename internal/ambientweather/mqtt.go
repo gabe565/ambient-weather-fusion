@@ -3,18 +3,32 @@ package ambientweather
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"log/slog"
 	"net/url"
+	"os"
 
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 )
 
 func (s *Server) ConnectMQTT(ctx context.Context) error {
+	var pool *x509.CertPool
+	if s.conf.MQTTCAPath != "" {
+		var err error
+		if pool, err = loadCACert(s.conf.MQTTCAPath); err != nil {
+			return err
+		}
+	}
+
 	log := slog.With("url", s.conf.MQTTURL.String())
 	cliCfg := autopaho.ClientConfig{
-		ServerUrls:            []*url.URL{s.conf.MQTTURL.URL},
-		TlsCfg:                &tls.Config{InsecureSkipVerify: s.conf.MQTTInsecureSkipVerify}, //nolint:gosec
+		ServerUrls: []*url.URL{s.conf.MQTTURL.URL},
+		TlsCfg: &tls.Config{
+			InsecureSkipVerify: s.conf.MQTTInsecureSkipVerify, //nolint:gosec
+			RootCAs:            pool,
+		},
 		KeepAlive:             s.conf.MQTTKeepAlive,
 		SessionExpiryInterval: s.conf.MQTTSessionExpiry,
 		OnConnectionUp: func(_ *autopaho.ConnectionManager, _ *paho.Connack) {
@@ -84,4 +98,32 @@ func (s *Server) ConnectMQTT(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func loadCACert(path string) (*x509.CertPool, error) {
+	pool := x509.NewCertPool()
+
+	pemCerts, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	for len(pemCerts) != 0 {
+		var block *pem.Block
+		if block, pemCerts = pem.Decode(pemCerts); block == nil {
+			break
+		}
+		if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+			continue
+		}
+
+		cert, err := x509.ParseCertificate(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+
+		pool.AddCert(cert)
+	}
+
+	return pool, nil
 }
