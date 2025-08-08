@@ -5,7 +5,7 @@ go 1.24.6
 require (
 	gabe565.com/utils v0.0.0-20250302063333-ede73b14282c
 	github.com/eclipse/paho.golang v0.22.0
-	github.com/jedib0t/go-pretty/v6 v6.6.7
+	github.com/jedib0t/go-pretty/v6 v6.6.8
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7
 	github.com/stretchr/testify v1.10.0
