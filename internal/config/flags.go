@@ -13,6 +13,8 @@ const (
 	FlagMQTTUsername      = "mqtt-username"
 	FlagMQTTPassword      = "mqtt-password"
 	FlagMQTTCA            = "mqtt-ca"
+	FlagMQTTClientCert    = "mqtt-client-cert"
+	FlagMQTTClientKey     = "mqtt-client-key"
 	FlagMQTTInsecure      = "mqtt-insecure"
 	FlagMQTTKeepAlive     = "mqtt-keep-alive"
 	FlagMQTTSessionExpiry = "mqtt-session-expiry"
@@ -35,6 +37,8 @@ func (c *Config) RegisterFlags(cmd *cobra.Command) {
 	fs.StringVar(&c.MQTTUsername, FlagMQTTUsername, c.MQTTUsername, "MQTT username")
 	fs.StringVar(&c.MQTTPassword, FlagMQTTPassword, c.MQTTPassword, "MQTT password")
 	fs.StringVar(&c.MQTTCAPath, FlagMQTTCA, c.MQTTCAPath, "MQTT CA certificate file path")
+	fs.StringVar(&c.MQTTClientCertPath, FlagMQTTClientCert, c.MQTTClientCertPath, "MQTT client certificate file path")
+	fs.StringVar(&c.MQTTClientKeyPath, FlagMQTTClientKey, c.MQTTClientKeyPath, "MQTT client certificate key file path")
 	fs.BoolVar(&c.MQTTInsecureSkipVerify, FlagMQTTInsecure, c.MQTTInsecureSkipVerify, "Skip MQTT TLS verification")
 	fs.Uint16Var(&c.MQTTKeepAlive, FlagMQTTKeepAlive, c.MQTTKeepAlive, "MQTT keep alive interval in seconds")
 	fs.Uint32Var(&c.MQTTSessionExpiry, FlagMQTTSessionExpiry, c.MQTTSessionExpiry,

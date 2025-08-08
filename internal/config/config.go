@@ -19,6 +19,8 @@ type Config struct {
 	MQTTUsername           string
 	MQTTPassword           string
 	MQTTCAPath             string
+	MQTTClientCertPath     string
+	MQTTClientKeyPath      string
 	MQTTInsecureSkipVerify bool
 	MQTTKeepAlive          uint16
 	MQTTSessionExpiry      uint32

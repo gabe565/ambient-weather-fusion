@@ -10,6 +10,8 @@
 | `AW_LONGITUDE` | Longitude of center | `0` |
 | `AW_MAX_READING_AGE` | Maximum age of a reading to be included | `10m0s` |
 | `AW_MQTT_CA` | MQTT CA certificate file path | ` ` |
+| `AW_MQTT_CLIENT_CERT` | MQTT client certificate file path | ` ` |
+| `AW_MQTT_CLIENT_KEY` | MQTT client certificate key file path | ` ` |
 | `AW_MQTT_INSECURE` | Skip MQTT TLS verification | `false` |
 | `AW_MQTT_KEEP_ALIVE` | MQTT keep alive interval in seconds | `60` |
 | `AW_MQTT_PASSWORD` | MQTT password | ` ` |

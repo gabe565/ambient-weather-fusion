@@ -18,6 +18,8 @@ ambient-weather-fusion [flags]
       --longitude float              Longitude of center
       --max-reading-age duration     Maximum age of a reading to be included (default 10m0s)
       --mqtt-ca string               MQTT CA certificate file path
+      --mqtt-client-cert string      MQTT client certificate file path
+      --mqtt-client-key string       MQTT client certificate key file path
       --mqtt-insecure                Skip MQTT TLS verification
       --mqtt-keep-alive uint16       MQTT keep alive interval in seconds (default 60)
       --mqtt-password string         MQTT password

@@ -5,30 +5,26 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"log/slog"
 	"net/url"
 	"os"
 
+	"gabe565.com/ambient-weather-fusion/internal/config"
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 )
 
 func (s *Server) ConnectMQTT(ctx context.Context) error {
-	var pool *x509.CertPool
-	if s.conf.MQTTCAPath != "" {
-		var err error
-		if pool, err = loadCACert(s.conf.MQTTCAPath); err != nil {
-			return err
-		}
+	tlsConf, err := newMQTTTLSConfig(s.conf)
+	if err != nil {
+		return fmt.Errorf("failed to create TLS config: %w", err)
 	}
 
 	log := slog.With("url", s.conf.MQTTURL.String())
 	cliCfg := autopaho.ClientConfig{
-		ServerUrls: []*url.URL{s.conf.MQTTURL.URL},
-		TlsCfg: &tls.Config{
-			InsecureSkipVerify: s.conf.MQTTInsecureSkipVerify, //nolint:gosec
-			RootCAs:            pool,
-		},
+		ServerUrls:            []*url.URL{s.conf.MQTTURL.URL},
+		TlsCfg:                tlsConf,
 		KeepAlive:             s.conf.MQTTKeepAlive,
 		SessionExpiryInterval: s.conf.MQTTSessionExpiry,
 		OnConnectionUp: func(_ *autopaho.ConnectionManager, _ *paho.Connack) {
@@ -85,9 +81,7 @@ func (s *Server) ConnectMQTT(ctx context.Context) error {
 		},
 	}
 
-	var err error
-	s.mqtt, err = autopaho.NewConnection(context.Background(), cliCfg)
-	if err != nil {
+	if s.mqtt, err = autopaho.NewConnection(context.Background(), cliCfg); err != nil {
 		return err
 	}
 
@@ -126,4 +120,30 @@ func loadCACert(path string) (*x509.CertPool, error) {
 	}
 
 	return pool, nil
+}
+
+func newMQTTTLSConfig(conf *config.Config) (*tls.Config, error) {
+	tlsConf := &tls.Config{
+		InsecureSkipVerify: conf.MQTTInsecureSkipVerify, //nolint:gosec
+	}
+
+	if conf.MQTTCAPath != "" {
+		pool, err := loadCACert(conf.MQTTCAPath)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsConf.RootCAs = pool
+	}
+
+	if conf.MQTTClientCertPath != "" || conf.MQTTClientKeyPath != "" {
+		cert, err := tls.LoadX509KeyPair(conf.MQTTClientCertPath, conf.MQTTClientKeyPath)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsConf.Certificates = []tls.Certificate{cert}
+	}
+
+	return tlsConf, nil
 }
