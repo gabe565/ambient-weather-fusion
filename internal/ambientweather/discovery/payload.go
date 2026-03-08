@@ -23,7 +23,7 @@ type Origin struct {
 type Component struct {
 	Name                      string      `json:"name,omitempty"`
 	Platform                  Platform    `json:"p,omitempty"`
-	ObjectID                  string      `json:"obj_id,omitempty"`
+	DefaultEntityID           string      `json:"def_ent_id,omitempty"`
 	UniqueID                  string      `json:"uniq_id,omitempty"`
 	ValueTemplate             string      `json:"val_tpl,omitempty"`
 	UnitOfMeasurement         Unit        `json:"unit_of_meas,omitempty"`

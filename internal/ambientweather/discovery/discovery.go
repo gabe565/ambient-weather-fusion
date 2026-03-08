@@ -137,8 +137,8 @@ func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
 	}
 
 	for topic, sensor := range components {
-		sensor.ObjectID = conf.BaseTopic + "_" + string(topic)
 		sensor.UniqueID = conf.BaseTopic + "_" + string(topic)
+		sensor.DefaultEntityID = "sensor." + sensor.UniqueID
 		sensor.ValueTemplate = "{{ value_json." + string(topic) + " }}"
 		components[topic] = sensor
 	}
