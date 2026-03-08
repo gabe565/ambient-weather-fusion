@@ -8,7 +8,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.7.8
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
 )
 
