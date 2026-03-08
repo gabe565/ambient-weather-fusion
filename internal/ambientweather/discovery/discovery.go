@@ -4,7 +4,6 @@ import (
 	"path"
 
 	"gabe565.com/ambient-weather-fusion/internal/config"
-	"k8s.io/utils/ptr"
 )
 
 func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
@@ -59,7 +58,7 @@ func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
 			DeviceClass:               DeviceClassIrradiance,
 			StateClass:                StateClassMeasurement,
 			SuggestedDisplayPrecision: 1,
-			EnabledByDefault:          ptr.To(false),
+			EnabledByDefault:          new(false),
 		},
 		TopicHourlyRain: {
 			Platform:                  PlatformSensor,
@@ -84,7 +83,7 @@ func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
 			DeviceClass:               DeviceClassPrecipitation,
 			StateClass:                StateClassTotal,
 			SuggestedDisplayPrecision: 2,
-			EnabledByDefault:          ptr.To(false),
+			EnabledByDefault:          new(false),
 		},
 		TopicMonthlyRain: {
 			Platform:                  PlatformSensor,
@@ -93,7 +92,7 @@ func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
 			DeviceClass:               DeviceClassPrecipitation,
 			StateClass:                StateClassTotal,
 			SuggestedDisplayPrecision: 2,
-			EnabledByDefault:          ptr.To(false),
+			EnabledByDefault:          new(false),
 		},
 		TopicRelativePressure: {
 			Platform:                  PlatformSensor,
@@ -110,13 +109,13 @@ func NewPayload(conf *config.Config, version string) Payload { //nolint:funlen
 			DeviceClass:               DeviceClassPressure,
 			StateClass:                StateClassMeasurement,
 			SuggestedDisplayPrecision: 2,
-			EnabledByDefault:          ptr.To(false),
+			EnabledByDefault:          new(false),
 		},
 		TopicLastRain: {
 			Platform:         PlatformSensor,
 			Name:             "Last rain",
 			DeviceClass:      DeviceClassTimestamp,
-			EnabledByDefault: ptr.To(false),
+			EnabledByDefault: new(false),
 			Icon:             "mdi:water",
 		},
 		TopicFeelsLike: {
