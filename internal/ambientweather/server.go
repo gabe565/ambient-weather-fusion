@@ -106,7 +106,7 @@ func (s *Server) FetchData(ctx context.Context) ([]Data, error) {
 	for decoder.More() {
 		var entry Data
 		if err := decoder.Decode(&entry); err != nil {
-			continue
+			return nil, err
 		}
 
 		if entry.Info.Indoor == nil || *entry.Info.Indoor || entry.LastData.TempF == nil {
