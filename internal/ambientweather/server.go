@@ -207,18 +207,18 @@ func (s *Server) Run(ctx context.Context) error {
 		return err
 	}
 
-	ticker := time.NewTicker(1)
+	ticker := time.NewTicker(5 * time.Minute)
 	defer ticker.Stop()
 
 	for {
+		if err := s.Tick(ctx); err != nil {
+			slog.Error("Failed to process ambient-weather data", "error", err)
+		}
+
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			ticker.Reset(5 * time.Minute)
-			if err := s.Tick(ctx); err != nil {
-				slog.Error("Failed to process ambient-weather data", "error", err)
-			}
 		}
 	}
 }
