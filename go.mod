@@ -3,7 +3,7 @@ module gabe565.com/ambient-weather-fusion
 go 1.26.1
 
 require (
-	gabe565.com/utils v0.0.0-20251001054419-00a1424779a7
+	gabe565.com/utils v0.0.0-20260310002041-b3b94f17b36b
 	github.com/eclipse/paho.golang v0.23.0
 	github.com/jedib0t/go-pretty/v6 v6.7.8
 	github.com/spf13/cobra v1.10.2
