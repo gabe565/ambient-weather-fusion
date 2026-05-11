@@ -69,6 +69,18 @@ func TestPoint_ShiftPoint(t *testing.T) {
 			args{Pt(4, 4)},
 			Pt(40.74708914323121, -73.96815500763032),
 		},
+		{
+			"negative delta",
+			statueOfLiberty(),
+			args{Pt(-4, -4)},
+			Pt(40.63131085676879, -74.12084499236968),
+		},
+		{
+			"zero delta",
+			statueOfLiberty(),
+			args{Pt(0, 0)},
+			statueOfLiberty(),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
