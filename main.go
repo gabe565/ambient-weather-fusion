@@ -7,10 +7,8 @@ import (
 	"gabe565.com/utils/cobrax"
 )
 
-var version = "beta"
-
 func main() {
-	root := cmd.New(cobrax.WithVersion(version))
+	root := cmd.New(cobrax.WithVersion(""))
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
