@@ -36,18 +36,16 @@ func computeMedian[V constraints.Number](inputs []Data, fn func(Data) *V) *V {
 
 	slices.Sort(vals)
 
-	var val V
 	switch {
 	case len(vals) == 0:
 		return nil
 	case len(vals) == 1:
-		val = vals[0]
+		return &vals[0]
 	case len(vals)%2 != 0:
-		val = vals[len(vals)/2]
+		return &vals[len(vals)/2]
 	default:
-		val = (vals[len(vals)/2-1] + vals[len(vals)/2]) / 2
+		return new((vals[len(vals)/2-1] + vals[len(vals)/2]) / 2)
 	}
-	return &val
 }
 
 func NewPayload(entries []Data) *Payload {
