@@ -7,7 +7,7 @@ import (
 
 type Payload struct {
 	Temperature      *float64 `json:"temperature,omitempty"`
-	Humidity         *int     `json:"humidity,omitempty"`
+	Humidity         *float64 `json:"humidity,omitempty"`
 	WindSpeed        *float64 `json:"wind_speed,omitempty"`
 	WindGust         *float64 `json:"wind_gust,omitempty"`
 	MaxDailyGust     *float64 `json:"max_daily_gust,omitempty"`
@@ -51,7 +51,7 @@ func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) *V) *V 
 func NewPayload(entries []Data) *Payload {
 	p := &Payload{
 		Temperature:      computeMedian(entries, func(data Data) *float64 { return data.LastData.TempF }),
-		Humidity:         computeMedian(entries, func(data Data) *int { return data.LastData.Humidity }),
+		Humidity:         computeMedian(entries, func(data Data) *float64 { return data.LastData.Humidity }),
 		WindSpeed:        computeMedian(entries, func(data Data) *float64 { return data.LastData.WindSpeedMPH }),
 		WindGust:         computeMedian(entries, func(data Data) *float64 { return data.LastData.WindGustMPH }),
 		MaxDailyGust:     computeMedian(entries, func(data Data) *float64 { return data.LastData.MaxDailyGust }),

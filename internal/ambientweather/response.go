@@ -14,7 +14,7 @@ type Data struct {
 type LastData struct {
 	DateUTC            int64    `json:"dateutc"`
 	TempF              *float64 `json:"tempf"`
-	Humidity           *int     `json:"humidity"`
+	Humidity           *float64 `json:"humidity"`
 	WindSpeedMPH       *float64 `json:"windspeedmph"`
 	WindGustMPH        *float64 `json:"windgustmph"`
 	MaxDailyGust       *float64 `json:"maxdailygust"`
