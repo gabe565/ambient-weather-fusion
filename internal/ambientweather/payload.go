@@ -3,6 +3,8 @@ package ambientweather
 import (
 	"slices"
 	"time"
+
+	"gabe565.com/ambient-weather-fusion/pkg/constraints"
 )
 
 type Payload struct {
@@ -24,7 +26,7 @@ type Payload struct {
 	DewPoint         *float64 `json:"dew_point,omitempty"`
 }
 
-func computeMedian[V int | int64 | float64](inputs []Data, fn func(Data) *V) *V {
+func computeMedian[V constraints.Number](inputs []Data, fn func(Data) *V) *V {
 	vals := make([]V, 0, len(inputs))
 	for _, entry := range inputs {
 		if val := fn(entry); val != nil {
