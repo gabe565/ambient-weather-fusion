@@ -11,7 +11,7 @@ type Payload struct {
 	WindSpeed        *float64 `json:"wind_speed,omitempty"`
 	WindGust         *float64 `json:"wind_gust,omitempty"`
 	MaxDailyGust     *float64 `json:"max_daily_gust,omitempty"`
-	UVIndex          *int     `json:"uv_index,omitempty"`
+	UVIndex          *float64 `json:"uv_index,omitempty"`
 	SolarRadiation   *float64 `json:"solar_radiation,omitempty"`
 	HourlyRain       *float64 `json:"hourly_rain,omitempty"`
 	DailyRain        *float64 `json:"daily_rain,omitempty"`
@@ -55,7 +55,7 @@ func NewPayload(entries []Data) *Payload {
 		WindSpeed:        computeMedian(entries, func(data Data) *float64 { return data.LastData.WindSpeedMPH }),
 		WindGust:         computeMedian(entries, func(data Data) *float64 { return data.LastData.WindGustMPH }),
 		MaxDailyGust:     computeMedian(entries, func(data Data) *float64 { return data.LastData.MaxDailyGust }),
-		UVIndex:          computeMedian(entries, func(data Data) *int { return data.LastData.UV }),
+		UVIndex:          computeMedian(entries, func(data Data) *float64 { return data.LastData.UV }),
 		SolarRadiation:   computeMedian(entries, func(data Data) *float64 { return data.LastData.SolarRadiation }),
 		HourlyRain:       computeMedian(entries, func(data Data) *float64 { return data.LastData.HourlyRainIn }),
 		DailyRain:        computeMedian(entries, func(data Data) *float64 { return data.LastData.DailyRainIn }),

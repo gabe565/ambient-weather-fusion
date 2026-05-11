@@ -18,7 +18,7 @@ type LastData struct {
 	WindSpeedMPH       *float64 `json:"windspeedmph"`
 	WindGustMPH        *float64 `json:"windgustmph"`
 	MaxDailyGust       *float64 `json:"maxdailygust"`
-	UV                 *int     `json:"uv"`
+	UV                 *float64 `json:"uv"`
 	SolarRadiation     *float64 `json:"solarradiation"`
 	HourlyRainIn       *float64 `json:"hourlyrainin"`
 	DailyRainIn        *float64 `json:"dailyrainin"`
