@@ -21,7 +21,7 @@ func DewPointC[Temp, Humidity constraints.Number](tempC Temp, humidity Humidity)
 }
 
 // WindChillC computes the wind chill in Celsius.
-func WindChillC[Temp, Humidity constraints.Number](tempC Temp, windSpeedKMH Humidity) float64 {
+func WindChillC[Temp, WindSpeed constraints.Number](tempC Temp, windSpeedKMH WindSpeed) float64 {
 	tempF := CtoF(tempC)
 	windSpeedMPH := KMHtoMPH(windSpeedKMH)
 	windChillF := WindChillF(tempF, windSpeedMPH)

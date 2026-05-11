@@ -14,7 +14,7 @@ func DewPointF[Temp, Humidity constraints.Number](tempF Temp, humidity Humidity)
 }
 
 // WindChillF computes the wind chill in Fahrenheit.
-func WindChillF[Temp, Humidity constraints.Number](tempF Temp, windSpeedMPH Humidity) float64 {
+func WindChillF[Temp, WindSpeed constraints.Number](tempF Temp, windSpeedMPH WindSpeed) float64 {
 	if windSpeedMPH < 3 || tempF > 50 {
 		return float64(tempF)
 	}
