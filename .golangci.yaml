@@ -125,6 +125,8 @@ linters:
     funlen:
       lines: 100
       statements: 50
+    goconst:
+      ignore-tests: true
     gocritic:
       settings:
         captLocal:
@@ -161,6 +163,3 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
-    rules:
-      - linters: [goconst]
-        path: _test\.go
