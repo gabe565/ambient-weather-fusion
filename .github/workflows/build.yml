@@ -86,10 +86,10 @@ jobs:
           done \
             < <(docker image ls --format=json | \
               yq --input-format=json --output-format=tsv '
-                select(.Repository == strenv(REPO)) |
+                select(.Repository == strenv(REPO) and (.Tag | test("^latest-"))) |
                 [
                   .Repository + ":" + .Tag,
-                  .Repository + ":beta-" + (.Tag | sub(".*-", ""))
+                  .Repository + ":beta-" + (.Tag | sub("^latest-", ""))
                 ]
               ')
 

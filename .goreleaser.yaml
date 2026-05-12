@@ -46,37 +46,16 @@ changelog:
       regexp: "\\(deps\\):"
     - title: Others
       order: 998
-dockers:
-  - &dockers
-    image_templates:
-      - ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}-amd64
-    use: buildx
-    dockerfile: goreleaser.Dockerfile
-    build_flag_templates:
-      - "--platform=linux/amd64"
-  - <<: *dockers
-    image_templates:
-      - ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}-armv7
-    goarch: arm
-    goarm: 7
-    build_flag_templates:
-      - "--platform=linux/arm/v7"
-  - <<: *dockers
-    image_templates:
-      - ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}-arm64v8
-    goarch: arm64
-    build_flag_templates:
-      - "--platform=linux/arm64/v8"
-docker_manifests:
-  - &docker_manifests
-    name_template: ghcr.io/gabe565/{{ .ProjectName }}:latest
-    image_templates:
-      - ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}-amd64
-      - ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}-armv7
-      - ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}-arm64v8
-  - <<: *docker_manifests
-    name_template: ghcr.io/gabe565/{{ .ProjectName }}:{{ .Version }}
-  - <<: *docker_manifests
-    name_template: ghcr.io/gabe565/{{ .ProjectName }}:{{ .Major }}
-  - <<: *docker_manifests
-    name_template: ghcr.io/gabe565/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}
+dockers_v2:
+  - dockerfile: goreleaser.Dockerfile
+    images:
+      - ghcr.io/gabe565/{{ .ProjectName }}
+    tags:
+      - latest
+      - "{{ .Version }}"
+      - "{{ .Major }}"
+      - "{{ .Major }}.{{ .Minor }}"
+    platforms:
+      - linux/amd64
+      - linux/arm/v7
+      - linux/arm64

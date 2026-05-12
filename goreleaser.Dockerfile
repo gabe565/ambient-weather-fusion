@@ -1,4 +1,5 @@
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
-COPY ambient-weather-fusion /
+ARG TARGETPLATFORM
+COPY ${TARGETPLATFORM}/ambient-weather-fusion /
 ENTRYPOINT ["/ambient-weather-fusion"]
