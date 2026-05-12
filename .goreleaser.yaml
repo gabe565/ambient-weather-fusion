@@ -10,14 +10,7 @@ builds:
       - -trimpath
     goarch:
       - amd64
-      - arm
       - arm64
-    goarm:
-      - "7"
-    ignore:
-      - goos: windows
-        goarch: arm
-        goarm: 7
 archives:
   - formats: tar.gz
     # use zip for windows archives
@@ -57,5 +50,4 @@ dockers_v2:
       - "{{ .Major }}.{{ .Minor }}"
     platforms:
       - linux/amd64
-      - linux/arm/v7
       - linux/arm64
