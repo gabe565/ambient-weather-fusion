@@ -53,31 +53,29 @@ func (s *Server) ConnectMQTT(ctx context.Context) error {
 			Topic:   s.conf.BaseTopic + "/status",
 			Payload: []byte("offline"),
 		},
-		ClientConfig: paho.ClientConfig{
-			ClientID: s.conf.BaseTopic,
-			OnPublishReceived: []func(received paho.PublishReceived) (bool, error){
-				func(r paho.PublishReceived) (bool, error) {
-					if r.Packet.Topic == s.conf.HAStatusTopic && string(r.Packet.Payload) == "online" {
-						if s.lastPayload == nil {
-							return true, nil
-						}
-						return true, s.PublishData(ctx, s.lastPayload)
+		ClientID: s.conf.BaseTopic,
+		OnPublishReceived: []func(received paho.PublishReceived) (bool, error){
+			func(r paho.PublishReceived) (bool, error) {
+				if r.Packet.Topic == s.conf.HAStatusTopic && string(r.Packet.Payload) == "online" {
+					if s.lastPayload == nil {
+						return true, nil
 					}
-					return false, nil
-				},
-			},
-			OnClientError: func(err error) {
-				log.Error("Client error", "error", err)
-			},
-			OnServerDisconnect: func(d *paho.Disconnect) {
-				var disconnectLog *slog.Logger
-				if d.Properties != nil {
-					disconnectLog = log.With("reason", d.Properties.ReasonString)
-				} else {
-					disconnectLog = log.With("reason", d.ReasonCode)
+					return true, s.PublishData(ctx, s.lastPayload)
 				}
-				disconnectLog.Info("Server requested disconnect")
+				return false, nil
 			},
+		},
+		OnClientError: func(err error) {
+			log.Error("Client error", "error", err)
+		},
+		OnServerDisconnect: func(d *paho.Disconnect) {
+			var disconnectLog *slog.Logger
+			if d.Properties != nil {
+				disconnectLog = log.With("reason", d.Properties.ReasonString)
+			} else {
+				disconnectLog = log.With("reason", d.ReasonCode)
+			}
+			disconnectLog.Info("Server requested disconnect")
 		},
 	}
 
